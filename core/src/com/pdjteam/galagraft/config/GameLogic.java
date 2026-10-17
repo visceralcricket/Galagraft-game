@@ -9,7 +9,6 @@ import com.pdjteam.galagraft.engine.entities.*;
 public class GameLogic {
 	private final Shulker jugador;
 	private final ArrayList<Esqueleto> mobs1 = new ArrayList<>();
-	private final ArrayList<Esqueleto> mobs2 = new ArrayList<>();
 	private final ArrayList<Bullet> balas = new ArrayList<>();
 	private int puntuacion;
 	private int ronda;
@@ -41,7 +40,6 @@ public class GameLogic {
 				intentos++;
 			} while (muyCerca(e) && intentos < GameConfig.ENEMIGO_INTENTOS_SPAWN);
 			mobs1.add(e);
-			mobs2.add(e);
 		}
 	}
 	
@@ -66,7 +64,6 @@ public class GameLogic {
 			for (int j = 0; j < mobs1.size(); j++) {
 				if (b.checkCollision(mobs1.get(j))) {
 					mobs1.remove(j);
-					mobs2.remove(j);
 					j--;
 					puntuacion += GameConfig.PUNTOS_POR_ENEMIGO;
 					destruidos++;
@@ -89,7 +86,7 @@ public class GameLogic {
 	public boolean agregarBala(Bullet b) { return balas.add(b); }
 	public boolean rondaCompletada( ) { return mobs1.isEmpty() && jugador.getVidas() > 0; }
 	public boolean juegoTerminado() { return jugador.estaDestruido(); }
-	public void eliminarEnemigo(int i) { mobs1.remove(i); mobs2.remove(i); }
+	public void eliminarEnemigo(int i) { mobs1.remove(i); }
 	
 	public int getPuntuacion() { return puntuacion; }
 	public int getRonda() { return ronda; }

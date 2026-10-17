@@ -38,7 +38,7 @@ public final class GameConfig {
 	// Assets
 	public static final String SND_EXPLOSION = "explosion.ogg";
 	public static final String SND_DANO = "hurt.ogg";
-	public static final String SND_DISPARO = "pop-sound.mp3";
+	public static final String SND_DISPARO = "shulker_sound.mp3";
 	public static final String SND_MUSICA_JUEGO = "piano-loops.wav";
 	public static final String TEX_SHULKER = "shulker.png";
 	public static final String TEX_BALA = "bala.png";
