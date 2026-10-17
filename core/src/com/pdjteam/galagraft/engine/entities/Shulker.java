@@ -19,7 +19,6 @@ public class Shulker extends EntidadDinamica {
 	private boolean destruida = false;
     private int vidas = 3;
     private float xVel = 0;
-    private float yVel = 0;
     private final float VELOCIDAD_NAVE = 6f; // velocidad fija manejable
     
     private Sprite spr;
@@ -47,7 +46,6 @@ public class Shulker extends EntidadDinamica {
         	
         	// resetear vector velocidad en cada frame para evitar inercia
         	xVel = 0;
-        	yVel = 0;
         	
         	if(Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
         		xVel = -VELOCIDAD_NAVE;
@@ -56,15 +54,8 @@ public class Shulker extends EntidadDinamica {
 	        	xVel = VELOCIDAD_NAVE;
 	        }
 	        
-        	if(Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {
-        		yVel = -VELOCIDAD_NAVE;
-        	}
-        	if(Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {
-        		yVel = VELOCIDAD_NAVE;
-        	}
-        	
         	float newX = x + xVel;
-        	float newY = y + yVel;
+        	float newY = y; // la nave solo se mueve en horizontal
         	
         	// físicas de borde (colisiones) en vez de rebote
         	if(newX < 0) newX = 0;
