@@ -20,8 +20,8 @@ public final class GameConfig {
 	public static final int PUNTOS_POR_ENEMIGO = 10;
 	
 	// Audio
-	public static final float VOLUMEN_MUSICA = 0.3f;
-	public static final float VOLUMEN_EXPLOSION = 0.3f;
+	public static final float VOLUMEN_MUSICA = 0.1f;
+	public static final float VOLUMEN_EXPLOSION = 0.1f;
 	
 	// Assets
 	public static final String SND_EXPLOSION = "explosion.ogg";
