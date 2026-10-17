@@ -5,28 +5,28 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.pdjteam.galagraft.Galagraft;
+import com.pdjteam.galagraft.config.*;
 
 
-public class Esqueletos {
+public class Esqueleto {
 	private int x;
     private int y;
     private int xSpeed;
     private int ySpeed;
     private Sprite spr;
 
-    public Esqueletos(int x, int y, int size, int xSpeed, int ySpeed, Texture tx) {
+    public Esqueleto(int x, int y, int size, int xSpeed, int ySpeed, Texture tx) {
     	spr = new Sprite(tx);
     	this.x = x; 
  	
         //validar que borde de esfera no quede fuera
     	if (x-size < 0) this.x = x+size;
-    	if (x+size > Galagraft.ANCHO_MUNDO)this.x = x-size;
+    	if (x+size > GameConfig.ANCHO_MUNDO)this.x = x-size;
          
         this.y = y;
         //validar que borde de esfera no quede fuera
     	if (y-size < 0) this.y = y+size;
-    	if (y+size > Galagraft.ALTO_MUNDO)this.y = y-size;
+    	if (y+size > GameConfig.ALTO_MUNDO)this.y = y-size;
     	
         spr.setPosition(x, y);
         this.setXSpeed(xSpeed);
@@ -36,9 +36,9 @@ public class Esqueletos {
         x += getXSpeed();
         y += getySpeed();
 
-        if (x+getXSpeed() < 0 || x+getXSpeed()+spr.getWidth() > Galagraft.ANCHO_MUNDO)
+        if (x+getXSpeed() < 0 || x+getXSpeed()+spr.getWidth() > GameConfig.ANCHO_MUNDO)
         	setXSpeed(getXSpeed() * -1);
-        if (y+getySpeed() < 0 || y+getySpeed()+spr.getHeight() > Galagraft.ALTO_MUNDO)
+        if (y+getySpeed() < 0 || y+getySpeed()+spr.getHeight() > GameConfig.ALTO_MUNDO)
         	setySpeed(getySpeed() * -1);
         spr.setPosition(x, y);
     }
@@ -50,7 +50,7 @@ public class Esqueletos {
     	spr.draw(batch);
     }
     
-    public void checkCollision(Esqueletos b2) {
+    public void checkCollision(Esqueleto b2) {
         if(spr.getBoundingRectangle().overlaps(b2.spr.getBoundingRectangle())){
         	// rebote
             if (getXSpeed() ==0) setXSpeed(getXSpeed() + b2.getXSpeed()/2);

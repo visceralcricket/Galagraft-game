@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 
 import com.pdjteam.galagraft.view.PantallaJuego;
-import com.pdjteam.galagraft.Galagraft;
+import com.pdjteam.galagraft.config.*;
 import com.pdjteam.galagraft.engine.entities.Bullet;
 
 
@@ -97,7 +97,7 @@ public class Shulker extends EntidadDinamica {
         }
     }
       
-    public boolean checkCollision(Esqueletos b) {
+    public boolean checkCollision(Esqueleto b) {
         if(!herido && b.getArea().overlaps(spr.getBoundingRectangle())) {
             vidas--;
             herido = true;

@@ -1,0 +1,85 @@
+package com.pdjteam.galagraft.config;
+
+import java.util.ArrayList;
+import java.util.Random;
+import com.badlogic.gdx.graphics.Texture;
+import com.pdjteam.galagraft.engine.entities.*;
+
+public class GameLogic {
+	private final Shulker jugador;
+	private final ArrayList<Esqueleto> mobs1 = new ArrayList<>();
+	private final ArrayList<Esqueleto> mobs2 = new ArrayList<>();
+	private final ArrayList<Bullet> balas = new ArrayList<>();
+	private int puntuacion;
+	private int ronda;
+	private int velX, velY, cantEnemigos;
+	
+	public GameLogic(Shulker jugador, int ronda, int puntuacion, int velX, int velY, int cantEnemigos, Texture[] texEnemigos) {
+		this.jugador = jugador;
+		this.ronda = ronda;
+		this.puntuacion = puntuacion;
+		this.velX = velX;
+		this.velY = velY;
+		this.cantEnemigos = cantEnemigos;
+		crearEnemigos(texEnemigos);
+	}
+	
+	private void crearEnemigos(Texture[] texEnemigos) {
+		Random r = new Random();
+		for (int i = 0; i < cantEnemigos; i++) {
+			Texture tex = texEnemigos[r.nextInt(texEnemigos.length)];
+			Esqueleto e = new Esqueleto(
+				r.nextInt(GameConfig.ANCHO_MUNDO),
+				50 + r.nextInt(GameConfig.ALTO_MUNDO - 50),
+				20 + r.nextInt(10), velX + r.nextInt(4), velY + r.nextInt(4), tex);
+			mobs1.add(e);
+			mobs2.add(e);
+		}
+	}
+
+	// Avanza fotograma y devuelve cuantos enemigos fueron destruidos por las balas
+	public int actualizar() {
+		int destruidos = 0;
+		if (jugador.estaHerido()) return 0;
+		
+		for (int i = 0; i < balas.size(); i++) {
+			Bullet b = balas.get(i);
+			b.update();
+			for (int j = 0; j < mobs1.size(); j++) {
+				if (b.checkCollision(mobs1.get(j))) {
+					mobs1.remove(j);
+					mobs2.remove(j);
+					j--;
+					puntuacion += GameConfig.PUNTOS_POR_ENEMIGO;
+					destruidos++;
+				}
+			}
+			if (b.isDestroyed()) {
+				balas.remove(i);
+				i--;
+			}
+		}
+		
+		for(Esqueleto e : mobs1) e.update();
+		
+		for (int i = 0; i < mobs1.size(); i++)
+			for (int j = i + 1; j < mobs2.size(); j++)
+				mobs1.get(i).checkCollision(mobs2.get(j));
+		
+		return destruidos;
+	}
+	
+	public boolean agregarBala(Bullet b) { return balas.add(b); }
+	public boolean rondaCompletada( ) { return mobs1.isEmpty(); }
+	public boolean juegoTerminado() { return jugador.estaDestruido(); }
+	public void eliminarEnemigo(int i) { mobs1.remove(i); mobs2.remove(i); }
+	
+	public int getPuntuacion() { return puntuacion; }
+	public int getRonda() { return ronda; }
+	public int getVelX() { return velX; }
+	public int getVelY() { return velY; }
+	public int getCantEnemigos() { return cantEnemigos; }
+	public Shulker getJugador() {return jugador;}
+	public ArrayList<Esqueleto> getEnemigos() { return mobs1; }
+	public ArrayList<Bullet> getBalas() { return balas;}
+}
