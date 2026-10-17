@@ -1,7 +1,6 @@
 package com.pdjteam.galagraft.view;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -14,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.pdjteam.galagraft.Galagraft;
 import com.pdjteam.galagraft.engine.entities.*;
+import com.pdjteam.galagraft.config.*;
 
 
 public class PantallaJuego implements Screen {
@@ -22,154 +22,113 @@ public class PantallaJuego implements Screen {
 	private OrthographicCamera camera;
 	private FitViewport viewport;
 	private SpriteBatch batch;
+	
+	private GameLogic logica;
+	private Texture[] texEnemigos;
+	
 	private Sound explosionSound;
 	private Music gameMusic;
-	private int score;
-	private int ronda;
-	private int velXAsteroides; 
-	private int velYAsteroides; 
-	private int cantAsteroides;
-	
-	private Shulker nave;
-	private  ArrayList<Esqueletos> balls1 = new ArrayList<>();
-	private  ArrayList<Esqueletos> balls2 = new ArrayList<>();
-	private  ArrayList<Bullet> balas = new ArrayList<>();
+	private Texture texShulker;
+	private Texture texBala;
+	private Sound sndDano;
+	private Sound sndDisparo;
 
-
-	public PantallaJuego(Galagraft game, int ronda, int vidas, int score,  
-			int velXAsteroides, int velYAsteroides, int cantAsteroides) {
-		this.game = game;
-		this.ronda = ronda;
-		this.score = score;
-		this.velXAsteroides = velXAsteroides;
-		this.velYAsteroides = velYAsteroides;
-		this.cantAsteroides = cantAsteroides;
+	public PantallaJuego(Galagraft game, int ronda, int vidas, int puntuacion, int velXEnemigos, int velYEnemigos, int cantEnemigos) {
 		
+		this.game = game;
 		batch = game.getBatch();
 		camera = new OrthographicCamera();
-		viewport = new FitViewport(Galagraft.ANCHO_MUNDO, Galagraft.ALTO_MUNDO, camera);
+		viewport = new FitViewport(GameConfig.ANCHO_MUNDO, GameConfig.ALTO_MUNDO, camera);
 		//inicializar assets; musica de fondo y efectos de sonido
-		explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.ogg"));
-		explosionSound.setVolume(1,0.5f);
-		gameMusic = Gdx.audio.newMusic(Gdx.files.internal("piano-loops.wav")); //
+		explosionSound = Gdx.audio.newSound(Gdx.files.internal(GameConfig.SND_EXPLOSION));
+		gameMusic = Gdx.audio.newMusic(Gdx.files.internal(GameConfig.SND_MUSICA_JUEGO));
 		
 		gameMusic.setLooping(true);
-		gameMusic.setVolume(0.5f);
+		gameMusic.setVolume(GameConfig.VOLUMEN_MUSICA);
 		gameMusic.play();
 		
+		texShulker = new Texture(Gdx.files.internal(GameConfig.TEX_SHULKER));
+		texBala = new Texture(Gdx.files.internal(GameConfig.TEX_BALA));
+		texEnemigos = new Texture[] {
+				new Texture(Gdx.files.internal(GameConfig.TEX_ENEMIGO_GRANDE)),
+				new Texture(Gdx.files.internal(GameConfig.TEX_ENEMIGO_MEDIANO)),
+				new Texture(Gdx.files.internal(GameConfig.TEX_ENEMIGO_PEQUENO))
+		};
+		sndDano = Gdx.audio.newSound(Gdx.files.internal(GameConfig.SND_DANO));
+		sndDisparo = Gdx.audio.newSound(Gdx.files.internal(GameConfig.SND_DISPARO));
+		
+		
 	    // cargar imagen de la nave, 64x64   
-	    nave = new Shulker(Galagraft.ANCHO_MUNDO/2-50,30,new Texture(Gdx.files.internal("MainShip3.png")),
-	    				Gdx.audio.newSound(Gdx.files.internal("hurt.ogg")), 
-	    				new Texture(Gdx.files.internal("Rocket2.png")), 
-	    				Gdx.audio.newSound(Gdx.files.internal("pop-sound.mp3"))); 
-        nave.setVidas(vidas);
+	    Shulker jugador = new Shulker(GameConfig.ANCHO_MUNDO/2-50,30, texShulker, sndDano, texBala, sndDisparo);
+	    jugador.setVidas(vidas);
         //crear asteroides
-        Random r = new Random();
-	    for (int i = 0; i < cantAsteroides; i++) {
-	        Esqueletos bb = new Esqueletos(r.nextInt(Galagraft.ANCHO_MUNDO),
-	        		50+r.nextInt(Galagraft.ALTO_MUNDO-50),
-	  	            20+r.nextInt(10), velXAsteroides+r.nextInt(4), velYAsteroides+r.nextInt(4), 
-	  	            new Texture(Gdx.files.internal("aGreyMedium4.png")));	   
-	  	    balls1.add(bb);
-	  	    balls2.add(bb);
-	  	}
+        logica = new GameLogic(jugador, ronda, puntuacion, velXEnemigos, velYEnemigos, cantEnemigos, texEnemigos);
 	}
     
 	public void dibujaEncabezado() {
-		CharSequence str = "Vidas: "+nave.getVidas()+" Ronda: "+ronda;
+		CharSequence str = "Vidas: " + logica.getJugador().getVidas() +" Ronda: " + logica.getRonda();
 		game.getFont().getData().setScale(2f);		
 		game.getFont().draw(batch, str, 10, 30);
-		game.getFont().draw(batch, "Score:"+this.score, Galagraft.ANCHO_MUNDO-150, 30);
-		game.getFont().draw(batch, "HighScore:"+game.getHighScore(), Galagraft.ANCHO_MUNDO/2-100, 30);
+		game.getFont().draw(batch, "Score:" + logica.getPuntuacion(), GameConfig.ANCHO_MUNDO-150, 30);
+		game.getFont().draw(batch, "HighScore:" + game.getHighScore(), GameConfig.ANCHO_MUNDO/2-100, 30);
 	}
+	
 	@Override
 	public void render(float delta) {
-		  Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		  viewport.apply();
-		  camera.update();
-		  batch.setProjectionMatrix(camera.combined);
-          batch.begin();
-		  dibujaEncabezado();
-	      if (!nave.estaHerido()) {
-		      // colisiones entre balas y asteroides y su destruccion  
-	    	  for (int i = 0; i < balas.size(); i++) {
-		            Bullet b = balas.get(i);
-		            b.update();
-		            for (int j = 0; j < balls1.size(); j++) {    
-		              if (b.checkCollision(balls1.get(j))) {          
-		            	 explosionSound.play();
-		            	 balls1.remove(j);
-		            	 balls2.remove(j);
-		            	 j--;
-		            	 score +=10;
-		              }   	  
-		  	        }
-		                
-		         //   b.draw(batch);
-		            if (b.isDestroyed()) {
-		                balas.remove(b);
-		                i--; //para no saltarse 1 tras eliminar del arraylist
-		            }
-		      }
-		      //actualizar movimiento de asteroides dentro del area
-		      for (Esqueletos ball : balls1) {
-		          ball.update();
-		      }
-		      //colisiones entre asteroides y sus rebotes  
-		      for (int i=0;i<balls1.size();i++) {
-		    	Esqueletos ball1 = balls1.get(i);   
-		        for (int j=0;j<balls2.size();j++) {
-		          Esqueletos esqueletos = balls2.get(j); 
-		          if (i<j) {
-		        	  ball1.checkCollision(esqueletos);
-		     
-		          }
-		        }
-		      } 
-	      }
-	      //dibujar balas
-	     for (Bullet b : balas) {       
-	          b.draw(batch);
-	      }
-	      nave.draw(batch, this);
-	      //dibujar asteroides y manejar colision con nave
-	      for (int i = 0; i < balls1.size(); i++) {
-	    	    Esqueletos b=balls1.get(i);
-	    	    b.draw(batch);
-		          //perdió vida o game over
-	              if (nave.checkCollision(b)) {
-		            //asteroide se destruye con el choque             
-	            	 balls1.remove(i);
-	            	 balls2.remove(i);
-	            	 i--;
-              }   	  
-  	        }
-	      
-	      if (nave.estaDestruido()) {
-  			if (score > game.getHighScore())
-  				game.setHighScore(score);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		viewport.apply();
+		camera.update();
+		batch.setProjectionMatrix(camera.combined);
+		
+		if (logica.actualizar() > 0) {
+			explosionSound.play(GameConfig.VOLUMEN_EXPLOSION);
+		}
+		
+        batch.begin();
+		dibujaEncabezado();
+	    //dibujar balas
+	    for (Bullet b : logica.getBalas()) {       
+	        b.draw(batch);
+	    }
+	    logica.getJugador().draw(batch, this);
+	    //dibujar asteroides y manejar colision con nave
+	    ArrayList<Esqueleto> enemigos = logica.getEnemigos();
+	    for (int i = 0; i < enemigos.size(); i++) {
+	    	Esqueleto e = enemigos.get(i);
+	    	e.draw(batch);
+		    //perdió vida o game over
+	        if (logica.getJugador().checkCollision(e)) {
+		       //asteroide se destruye con el choque             
+	           logica.eliminarEnemigo(i);
+	           i--;
+            }   	  
+  	    }
+	    
+	    if (logica.juegoTerminado()) {
+  			if (logica.getPuntuacion() > game.getHighScore())
+  				game.setHighScore(logica.getPuntuacion());
 	    	Screen ss = new PantallaGameOver(game);
   			game.setScreen(ss);
   			dispose();
-  		  }
-	      batch.end();
-	      //nivel completado
-	      if (balls1.size()==0) {
-			Screen ss = new PantallaJuego(game,ronda+1, nave.getVidas(), score, 
-					velXAsteroides+3, velYAsteroides+3, cantAsteroides+10);
+  		}
+	    batch.end();
+	    //nivel completado
+	    if (logica.rondaCompletada()) {
+			Screen ss = new PantallaJuego(game, logica.getRonda()+1, logica.getJugador().getVidas(),
+					logica.getPuntuacion(), logica.getVelX() + GameConfig.VEL_POR_RONDA, 
+					logica.getVelY() + GameConfig.VEL_POR_RONDA, logica.getCantEnemigos() + GameConfig.ENEMIGOS_POR_RONDA);
 			game.setScreen(ss);
 			dispose();
-		  }
+		}
 	    	 
 	}
     
     public boolean agregarBala(Bullet bb) {
-    	return balas.add(bb);
+    	return logica.agregarBala(bb);
     }
 	
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
 		gameMusic.play();
 	}
 
@@ -181,13 +140,13 @@ public class PantallaJuego implements Screen {
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
+		gameMusic.pause();
 		
 	}
 
 	@Override
 	public void resume() {
-		// TODO Auto-generated method stub
+		gameMusic.play();
 		
 	}
 
@@ -199,9 +158,13 @@ public class PantallaJuego implements Screen {
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
-		this.explosionSound.dispose();
-		this.gameMusic.dispose();
+		explosionSound.dispose();
+		gameMusic.dispose();
+		texShulker.dispose();
+		texBala.dispose();
+		for (Texture t : texEnemigos) t.dispose();
+		sndDano.dispose();
+		sndDisparo.dispose();
 	}
    
 }
