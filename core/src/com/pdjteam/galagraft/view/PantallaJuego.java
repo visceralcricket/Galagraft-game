@@ -11,13 +11,13 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.pdjteam.galagraft.engine.SpaceNavigation;
+import com.pdjteam.galagraft.Galagraft;
 import com.pdjteam.galagraft.engine.entities.*;
 
 
 public class PantallaJuego implements Screen {
 
-	private SpaceNavigation game;
+	private Galagraft game;
 	private OrthographicCamera camera;	
 	private SpriteBatch batch;
 	private Sound explosionSound;
@@ -34,7 +34,7 @@ public class PantallaJuego implements Screen {
 	private  ArrayList<Bullet> balas = new ArrayList<>();
 
 
-	public PantallaJuego(SpaceNavigation game, int ronda, int vidas, int score,  
+	public PantallaJuego(Galagraft game, int ronda, int vidas, int score,  
 			int velXAsteroides, int velYAsteroides, int cantAsteroides) {
 		this.game = game;
 		this.ronda = ronda;

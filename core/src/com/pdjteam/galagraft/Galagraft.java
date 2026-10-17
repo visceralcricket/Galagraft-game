@@ -1,31 +1,53 @@
 package com.pdjteam.galagraft;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
+import com.pdjteam.galagraft.view.PantallaMenu;
 
-public class Galagraft extends ApplicationAdapter {
-	SpriteBatch batch;
-	Texture img;
-	
-	@Override
-	public void create () {
+
+
+public class Galagraft extends Game {
+	private String nombreJuego = "Galagraft";
+	private SpriteBatch batch;
+	private BitmapFont font;
+	private int highScore;	
+
+	public void create() {
+		highScore = 0;
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
+		font = new BitmapFont(); // usa Arial font x defecto
+		font.getData().setScale(2f);
+		Screen ss = new PantallaMenu(this);
+		this.setScreen(ss);
 	}
 
-	@Override
-	public void render () {
-		ScreenUtils.clear(1, 0, 0, 1);
-		batch.begin();
-		batch.draw(img, 0, 0);
-		batch.end();
+	public void render() {
+		super.render(); // important!
+	}
+
+	public void dispose() {
+		batch.dispose();
+		font.dispose();
+	}
+
+	public SpriteBatch getBatch() {
+		return batch;
+	}
+
+	public BitmapFont getFont() {
+		return font;
+	}
+
+	public int getHighScore() {
+		return highScore;
+	}
+
+	public void setHighScore(int highScore) {
+		this.highScore = highScore;
 	}
 	
-	@Override
-	public void dispose () {
-		batch.dispose();
-		img.dispose();
-	}
+	
+
 }

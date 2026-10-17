@@ -5,15 +5,15 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.pdjteam.galagraft.engine.SpaceNavigation;
+import com.pdjteam.galagraft.Galagraft;
 
 
 public class PantallaGameOver implements Screen {
 
-	private SpaceNavigation game;
+	private Galagraft game;
 	private OrthographicCamera camera;
 
-	public PantallaGameOver(SpaceNavigation game) {
+	public PantallaGameOver(Galagraft game) {
 		this.game = game;
         
 		camera = new OrthographicCamera();

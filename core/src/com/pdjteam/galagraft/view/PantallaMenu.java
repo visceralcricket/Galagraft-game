@@ -5,15 +5,15 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.pdjteam.galagraft.engine.SpaceNavigation;
+import com.pdjteam.galagraft.Galagraft;
 
 
 public class PantallaMenu implements Screen {
 
-	private SpaceNavigation game;
+	private Galagraft game;
 	private OrthographicCamera camera;
 
-	public PantallaMenu(SpaceNavigation game) {
+	public PantallaMenu(Galagraft game) {
 		this.game = game;
         
 		camera = new OrthographicCamera();
@@ -28,7 +28,7 @@ public class PantallaMenu implements Screen {
 		game.getBatch().setProjectionMatrix(camera.combined);
 
 		game.getBatch().begin();
-		game.getFont().draw(game.getBatch(), "Bienvenido a Space Navigation !", 140, 400);
+		game.getFont().draw(game.getBatch(), "Bienvenido a Galagraft !", 140, 400);
 		game.getFont().draw(game.getBatch(), "Pincha en cualquier lado o presiona cualquier tecla para comenzar ...", 100, 300);
 	
 		game.getBatch().end();
