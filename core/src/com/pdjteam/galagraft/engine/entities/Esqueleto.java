@@ -17,29 +17,38 @@ public class Esqueleto {
 
     public Esqueleto(int x, int y, int size, int xSpeed, int ySpeed, Texture tx) {
     	spr = new Sprite(tx);
-    	this.x = x; 
- 	
-        //validar que borde de esfera no quede fuera
-    	if (x-size < 0) this.x = x+size;
-    	if (x+size > GameConfig.ANCHO_MUNDO)this.x = x-size;
-         
-        this.y = y;
-        //validar que borde de esfera no quede fuera
-    	if (y-size < 0) this.y = y+size;
-    	if (y+size > GameConfig.ALTO_MUNDO)this.y = y-size;
+    	this.x = Math.max(0,  Math.min(x, (int)(GameConfig.ANCHO_MUNDO - spr.getWidth())));
+    	this.y = Math.max(0,  Math.min(y, (int)(GameConfig.ALTO_MUNDO - spr.getWidth())));
     	
-        spr.setPosition(x, y);
+        spr.setPosition(this.x, this.y);
         this.setXSpeed(xSpeed);
-        this.setySpeed(ySpeed);
+        this.setYSpeed(ySpeed);
     }
+    
     public void update() {
         x += getXSpeed();
-        y += getySpeed();
-
+        y += getYSpeed();
+        
+        if (x < 0) {
+        	x = 0;
+        	setXSpeed(Math.abs(getXSpeed()));
+        } else if (x + spr.getWidth() > GameConfig.ANCHO_MUNDO) {
+        	x = (int)(GameConfig.ANCHO_MUNDO - spr.getWidth());
+        	setXSpeed(-Math.abs(getXSpeed()));
+        }
+        
+        if (y < 0) {
+        	y = 0;
+        	setXSpeed(Math.abs(getXSpeed()));
+        } else if (y + spr.getWidth() > GameConfig.ALTO_MUNDO) {
+        	y = (int)(GameConfig.ALTO_MUNDO - spr.getWidth());
+        	setYSpeed(-Math.abs(getYSpeed()));
+        }
+        
         if (x+getXSpeed() < 0 || x+getXSpeed()+spr.getWidth() > GameConfig.ANCHO_MUNDO)
         	setXSpeed(getXSpeed() * -1);
-        if (y+getySpeed() < 0 || y+getySpeed()+spr.getHeight() > GameConfig.ALTO_MUNDO)
-        	setySpeed(getySpeed() * -1);
+        if (y+getYSpeed() < 0 || y+getYSpeed()+spr.getHeight() > GameConfig.ALTO_MUNDO)
+        	setYSpeed(getYSpeed() * -1);
         spr.setPosition(x, y);
     }
     
@@ -58,10 +67,10 @@ public class Esqueleto {
         	setXSpeed(- getXSpeed());
             b2.setXSpeed(-b2.getXSpeed());
             
-            if (getySpeed() ==0) setySpeed(getySpeed() + b2.getySpeed()/2);
-            if (b2.getySpeed() ==0) b2.setySpeed(b2.getySpeed() + getySpeed()/2);
-            setySpeed(- getySpeed());
-            b2.setySpeed(- b2.getySpeed()); 
+            if (getYSpeed() ==0) setYSpeed(getYSpeed() + b2.getYSpeed()/2);
+            if (b2.getYSpeed() ==0) b2.setYSpeed(b2.getYSpeed() + getYSpeed()/2);
+            setYSpeed(- getYSpeed());
+            b2.setYSpeed(- b2.getYSpeed()); 
         }
     }
 	public int getXSpeed() {
@@ -70,10 +79,10 @@ public class Esqueleto {
 	public void setXSpeed(int xSpeed) {
 		this.xSpeed = xSpeed;
 	}
-	public int getySpeed() {
+	public int getYSpeed() {
 		return ySpeed;
 	}
-	public void setySpeed(int ySpeed) {
+	public void setYSpeed(int ySpeed) {
 		this.ySpeed = ySpeed;
 	}
 	

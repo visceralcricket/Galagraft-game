@@ -68,13 +68,13 @@ public class Shulker extends EntidadDinamica {
         	
         	// físicas de borde (colisiones) en vez de rebote
         	if(newX < 0) newX = 0;
-        	else if(newX + spr.getWidth() > Galagraft.ANCHO_MUNDO) {
-        		newX = Galagraft.ANCHO_MUNDO - spr.getWidth();
+        	else if(newX + spr.getWidth() > GameConfig.ANCHO_MUNDO) {
+        		newX = GameConfig.ANCHO_MUNDO - spr.getWidth();
         	}
         	
         	if(newY < 0) newY = 0;
-        	else if(newY + spr.getHeight() > Galagraft.ALTO_MUNDO) {
-        		newY = Galagraft.ALTO_MUNDO - spr.getHeight();
+        	else if(newY + spr.getHeight() > GameConfig.ALTO_MUNDO) {
+        		newY = GameConfig.ALTO_MUNDO - spr.getHeight();
         	}
          
         	spr.setPosition(newX, newY);
