@@ -7,14 +7,14 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 
-public class Ball2 {
+public class Esqueletos {
 	private int x;
     private int y;
     private int xSpeed;
     private int ySpeed;
     private Sprite spr;
 
-    public Ball2(int x, int y, int size, int xSpeed, int ySpeed, Texture tx) {
+    public Esqueletos(int x, int y, int size, int xSpeed, int ySpeed, Texture tx) {
     	spr = new Sprite(tx);
     	this.x = x; 
  	
@@ -49,7 +49,7 @@ public class Ball2 {
     	spr.draw(batch);
     }
     
-    public void checkCollision(Ball2 b2) {
+    public void checkCollision(Esqueletos b2) {
         if(spr.getBoundingRectangle().overlaps(b2.spr.getBoundingRectangle())){
         	// rebote
             if (getXSpeed() ==0) setXSpeed(getXSpeed() + b2.getXSpeed()/2);

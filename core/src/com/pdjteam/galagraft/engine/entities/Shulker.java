@@ -12,7 +12,7 @@ import com.pdjteam.galagraft.engine.entities.Bullet;
 
 
 
-public class Nave4 {
+public class Shulker {
 	
 	private boolean destruida = false;
     private int vidas = 3;
@@ -26,7 +26,7 @@ public class Nave4 {
     private int tiempoHeridoMax=50;
     private int tiempoHerido;
     
-    public Nave4(int x, int y, Texture tx, Sound soundChoque, Texture txBala, Sound soundBala) {
+    public Shulker(int x, int y, Texture tx, Sound soundChoque, Texture txBala, Sound soundBala) {
     	sonidoHerido = soundChoque;
     	this.soundBala = soundBala;
     	this.txBala = txBala;
@@ -85,7 +85,7 @@ public class Nave4 {
        
     }
       
-    public boolean checkCollision(Ball2 b) {
+    public boolean checkCollision(Esqueletos b) {
         if(!herido && b.getArea().overlaps(spr.getBoundingRectangle())){
         	// rebote
             if (xVel ==0) xVel += b.getXSpeed()/2;
