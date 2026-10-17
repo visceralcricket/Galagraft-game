@@ -33,8 +33,8 @@ public class PantallaGameOver implements Screen {
 		game.getBatch().setProjectionMatrix(camera.combined);
 
 		game.getBatch().begin();
-		game.getFont().draw(game.getBatch(), "Game Over !!!", 0, 400, GameConfig.ANCHO_MUNDO, Align.center, false);
-		game.getFont().draw(game.getBatch(), "Pincha en cualquier lado para reiniciar ...", 0, 300, GameConfig.ANCHO_MUNDO, Align.center, false);
+		game.getFont().draw(game.getBatch(), "Game Over !!!", 0, GameConfig.ALTO_MUNDO / 2, GameConfig.ANCHO_MUNDO, Align.center, false);
+		game.getFont().draw(game.getBatch(), "Pincha en cualquier lado para reiniciar ...", 0, GameConfig.ALTO_MUNDO / 2 - 100, GameConfig.ANCHO_MUNDO, Align.center, false);
 	
 		game.getBatch().end();
 

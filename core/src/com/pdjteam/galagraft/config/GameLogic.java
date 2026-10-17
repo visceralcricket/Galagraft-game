@@ -81,9 +81,7 @@ public class GameLogic {
 		
 		for(Esqueleto e : mobs1) e.update();
 		
-		for (int i = 0; i < mobs1.size(); i++)
-			for (int j = i + 1; j < mobs2.size(); j++)
-				mobs1.get(i).checkCollision(mobs2.get(j));
+		// Sin rebote entre enemigos: un enemigo más rápido atraviesa al más lento y sigue su ruta
 		
 		return destruidos;
 	}
