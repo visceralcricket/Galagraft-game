@@ -14,7 +14,7 @@ public class Galagraft extends Game {
 	private BitmapFont font;
 	private int highScore;
 	public static final int ANCHO_MUNDO = 1200;
-	public static final int ALTO_MUNDO = 800;
+	public static final int ALTO_MUNDO = 800; // Hace más sentido decir ALTURA_MUNDO
 
 	public void create() {
 		highScore = 0;
