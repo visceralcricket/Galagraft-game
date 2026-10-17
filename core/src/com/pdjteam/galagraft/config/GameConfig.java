@@ -3,9 +3,9 @@ package com.pdjteam.galagraft.config;
 public final class GameConfig {
 	private GameConfig() {}
 	
-	// Resoluciones
-	public static final int ANCHO_MUNDO = 1200;
-	public static final int ALTO_MUNDO = 800;
+	// Resoluciones: el campo completo es la zona donde aparecen los enemigos (antes 1200x800)
+	public static final int ANCHO_MUNDO = 1800;
+	public static final int ALTO_MUNDO = 1200;
 	
 	// Valores iniciales
 	public static final int VIDAS_INICIALES = 3;
