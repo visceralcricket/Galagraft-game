@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.pdjteam.galagraft.view.PantallaJuego;
+import com.pdjteam.galagraft.Galagraft;
 import com.pdjteam.galagraft.engine.entities.Bullet;
 
 
@@ -61,9 +62,9 @@ public class Shulker {
 	        }*/
 	        
 	        // que se mantenga dentro de los bordes de la ventana
-	        if (x+xVel < 0 || x+xVel+spr.getWidth() > Gdx.graphics.getWidth())
+	        if (x+xVel < 0 || x+xVel+spr.getWidth() > Galagraft.ANCHO_MUNDO)
 	        	xVel*=-1;
-	        if (y+yVel < 0 || y+yVel+spr.getHeight() > Gdx.graphics.getHeight())
+	        if (y+yVel < 0 || y+yVel+spr.getHeight() > Galagraft.ALTO_MUNDO)
 	        	yVel*=-1;
 	        
 	        spr.setPosition(x+xVel, y+yVel);   

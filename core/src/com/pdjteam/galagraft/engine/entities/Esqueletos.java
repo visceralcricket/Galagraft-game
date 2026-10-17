@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+import com.pdjteam.galagraft.Galagraft;
 
 
 public class Esqueletos {
@@ -20,12 +21,12 @@ public class Esqueletos {
  	
         //validar que borde de esfera no quede fuera
     	if (x-size < 0) this.x = x+size;
-    	if (x+size > Gdx.graphics.getWidth())this.x = x-size;
+    	if (x+size > Galagraft.ANCHO_MUNDO)this.x = x-size;
          
         this.y = y;
         //validar que borde de esfera no quede fuera
     	if (y-size < 0) this.y = y+size;
-    	if (y+size > Gdx.graphics.getHeight())this.y = y-size;
+    	if (y+size > Galagraft.ALTO_MUNDO)this.y = y-size;
     	
         spr.setPosition(x, y);
         this.setXSpeed(xSpeed);
@@ -35,9 +36,9 @@ public class Esqueletos {
         x += getXSpeed();
         y += getySpeed();
 
-        if (x+getXSpeed() < 0 || x+getXSpeed()+spr.getWidth() > Gdx.graphics.getWidth())
+        if (x+getXSpeed() < 0 || x+getXSpeed()+spr.getWidth() > Galagraft.ANCHO_MUNDO)
         	setXSpeed(getXSpeed() * -1);
-        if (y+getySpeed() < 0 || y+getySpeed()+spr.getHeight() > Gdx.graphics.getHeight())
+        if (y+getySpeed() < 0 || y+getySpeed()+spr.getHeight() > Galagraft.ALTO_MUNDO)
         	setySpeed(getySpeed() * -1);
         spr.setPosition(x, y);
     }

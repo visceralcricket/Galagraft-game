@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.pdjteam.galagraft.Galagraft;
 
 
 public class Bullet {
@@ -21,10 +22,10 @@ public class Bullet {
 	    }
 	    public void update() {
 	        spr.setPosition(spr.getX()+xSpeed, spr.getY()+ySpeed);
-	        if (spr.getX() < 0 || spr.getX()+spr.getWidth() > Gdx.graphics.getWidth()) {
+	        if (spr.getX() < 0 || spr.getX()+spr.getWidth() > Galagraft.ANCHO_MUNDO)  {
 	            destroyed = true;
 	        }
-	        if (spr.getY() < 0 || spr.getY()+spr.getHeight() > Gdx.graphics.getHeight()) {
+	        if (spr.getY() < 0 || spr.getY()+spr.getHeight() > Galagraft.ALTO_MUNDO) {
 	        	destroyed = true;
 	        }
 	        

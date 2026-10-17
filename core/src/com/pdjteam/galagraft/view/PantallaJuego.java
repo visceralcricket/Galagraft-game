@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.pdjteam.galagraft.Galagraft;
 import com.pdjteam.galagraft.engine.entities.*;
 
@@ -18,7 +19,8 @@ import com.pdjteam.galagraft.engine.entities.*;
 public class PantallaJuego implements Screen {
 
 	private Galagraft game;
-	private OrthographicCamera camera;	
+	private OrthographicCamera camera;
+	private FitViewport viewport;
 	private SpriteBatch batch;
 	private Sound explosionSound;
 	private Music gameMusic;
@@ -44,8 +46,8 @@ public class PantallaJuego implements Screen {
 		this.cantAsteroides = cantAsteroides;
 		
 		batch = game.getBatch();
-		camera = new OrthographicCamera();	
-		camera.setToOrtho(false, 800, 640);
+		camera = new OrthographicCamera();
+		viewport = new FitViewport(Galagraft.ANCHO_MUNDO, Galagraft.ALTO_MUNDO, camera);
 		//inicializar assets; musica de fondo y efectos de sonido
 		explosionSound = Gdx.audio.newSound(Gdx.files.internal("explosion.ogg"));
 		explosionSound.setVolume(1,0.5f);
@@ -56,7 +58,7 @@ public class PantallaJuego implements Screen {
 		gameMusic.play();
 		
 	    // cargar imagen de la nave, 64x64   
-	    nave = new Shulker(Gdx.graphics.getWidth()/2-50,30,new Texture(Gdx.files.internal("MainShip3.png")),
+	    nave = new Shulker(Galagraft.ANCHO_MUNDO/2-50,30,new Texture(Gdx.files.internal("MainShip3.png")),
 	    				Gdx.audio.newSound(Gdx.files.internal("hurt.ogg")), 
 	    				new Texture(Gdx.files.internal("Rocket2.png")), 
 	    				Gdx.audio.newSound(Gdx.files.internal("pop-sound.mp3"))); 
@@ -64,8 +66,8 @@ public class PantallaJuego implements Screen {
         //crear asteroides
         Random r = new Random();
 	    for (int i = 0; i < cantAsteroides; i++) {
-	        Esqueletos bb = new Esqueletos(r.nextInt((int)Gdx.graphics.getWidth()),
-	  	            50+r.nextInt((int)Gdx.graphics.getHeight()-50),
+	        Esqueletos bb = new Esqueletos(r.nextInt(Galagraft.ANCHO_MUNDO),
+	        		50+r.nextInt(Galagraft.ALTO_MUNDO-50),
 	  	            20+r.nextInt(10), velXAsteroides+r.nextInt(4), velYAsteroides+r.nextInt(4), 
 	  	            new Texture(Gdx.files.internal("aGreyMedium4.png")));	   
 	  	    balls1.add(bb);
@@ -77,12 +79,15 @@ public class PantallaJuego implements Screen {
 		CharSequence str = "Vidas: "+nave.getVidas()+" Ronda: "+ronda;
 		game.getFont().getData().setScale(2f);		
 		game.getFont().draw(batch, str, 10, 30);
-		game.getFont().draw(batch, "Score:"+this.score, Gdx.graphics.getWidth()-150, 30);
-		game.getFont().draw(batch, "HighScore:"+game.getHighScore(), Gdx.graphics.getWidth()/2-100, 30);
+		game.getFont().draw(batch, "Score:"+this.score, Galagraft.ANCHO_MUNDO-150, 30);
+		game.getFont().draw(batch, "HighScore:"+game.getHighScore(), Galagraft.ANCHO_MUNDO/2-100, 30);
 	}
 	@Override
 	public void render(float delta) {
 		  Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		  viewport.apply();
+		  camera.update();
+		  batch.setProjectionMatrix(camera.combined);
           batch.begin();
 		  dibujaEncabezado();
 	      if (!nave.estaHerido()) {
@@ -144,7 +149,6 @@ public class PantallaJuego implements Screen {
   			if (score > game.getHighScore())
   				game.setHighScore(score);
 	    	Screen ss = new PantallaGameOver(game);
-  			ss.resize(1200, 800);
   			game.setScreen(ss);
   			dispose();
   		  }
@@ -153,7 +157,6 @@ public class PantallaJuego implements Screen {
 	      if (balls1.size()==0) {
 			Screen ss = new PantallaJuego(game,ronda+1, nave.getVidas(), score, 
 					velXAsteroides+3, velYAsteroides+3, cantAsteroides+10);
-			ss.resize(1200, 800);
 			game.setScreen(ss);
 			dispose();
 		  }
@@ -172,7 +175,7 @@ public class PantallaJuego implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
+		viewport.update(width, height, true);
 		
 	}
 

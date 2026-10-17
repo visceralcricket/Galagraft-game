@@ -12,7 +12,9 @@ public class Galagraft extends Game {
 	private String nombreJuego = "Galagraft";
 	private SpriteBatch batch;
 	private BitmapFont font;
-	private int highScore;	
+	private int highScore;
+	public static final int ANCHO_MUNDO = 1200;
+	public static final int ALTO_MUNDO = 800;
 
 	public void create() {
 		highScore = 0;
