@@ -70,6 +70,7 @@ public class GameLogic {
 					j--;
 					puntuacion += GameConfig.PUNTOS_POR_ENEMIGO;
 					destruidos++;
+					break;
 				}
 			}
 			if (b.isDestroyed()) {
@@ -88,7 +89,7 @@ public class GameLogic {
 	}
 	
 	public boolean agregarBala(Bullet b) { return balas.add(b); }
-	public boolean rondaCompletada( ) { return mobs1.isEmpty(); }
+	public boolean rondaCompletada( ) { return mobs1.isEmpty() && jugador.getVidas() > 0; }
 	public boolean juegoTerminado() { return jugador.estaDestruido(); }
 	public void eliminarEnemigo(int i) { mobs1.remove(i); mobs2.remove(i); }
 	

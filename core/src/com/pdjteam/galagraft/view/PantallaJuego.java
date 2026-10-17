@@ -103,24 +103,25 @@ public class PantallaJuego implements Screen {
 	           i--;
             }   	  
   	    }
+	    batch.end();
 	    
+	    // Derrota
 	    if (logica.juegoTerminado()) {
   			if (logica.getPuntuacion() > game.getHighScore())
   				game.setHighScore(logica.getPuntuacion());
 	    	Screen ss = new PantallaGameOver(game);
   			game.setScreen(ss);
   			dispose();
-  		}
-	    batch.end();
-	    //nivel completado
+  			return;
+  		};
+	    // Ronda completada
 	    if (logica.rondaCompletada()) {
 			Screen ss = new PantallaJuego(game, logica.getRonda()+1, logica.getJugador().getVidas(),
 					logica.getPuntuacion(), logica.getVelX() + GameConfig.VEL_POR_RONDA, 
 					logica.getVelY() + GameConfig.VEL_POR_RONDA, logica.getCantEnemigos() + GameConfig.ENEMIGOS_POR_RONDA);
 			game.setScreen(ss);
 			dispose();
-		}
-	    	 
+	    }
 	}
     
     public boolean agregarBala(Bullet bb) {
