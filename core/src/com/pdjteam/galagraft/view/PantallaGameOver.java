@@ -5,9 +5,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.pdjteam.galagraft.Galagraft;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.Align;
+import com.pdjteam.galagraft.Galagraft;
+import com.pdjteam.galagraft.config.*;
 
 
 public class PantallaGameOver implements Screen {
@@ -20,7 +21,7 @@ public class PantallaGameOver implements Screen {
 		this.game = game;
         
 		camera = new OrthographicCamera();
-		viewport = new FitViewport(Galagraft.ANCHO_MUNDO, Galagraft.ALTO_MUNDO, camera);
+		viewport = new FitViewport(GameConfig.ANCHO_MUNDO, GameConfig.ALTO_MUNDO, camera);
 	}
 
 	@Override
@@ -32,8 +33,8 @@ public class PantallaGameOver implements Screen {
 		game.getBatch().setProjectionMatrix(camera.combined);
 
 		game.getBatch().begin();
-		game.getFont().draw(game.getBatch(), "Game Over !!!", 0, 400, Galagraft.ANCHO_MUNDO, Align.center, false);
-		game.getFont().draw(game.getBatch(), "Pincha en cualquier lado para reiniciar ...", 0, 300, Galagraft.ANCHO_MUNDO, Align.center, false);
+		game.getFont().draw(game.getBatch(), "Game Over !!!", 0, 400, GameConfig.ANCHO_MUNDO, Align.center, false);
+		game.getFont().draw(game.getBatch(), "Pincha en cualquier lado para reiniciar ...", 0, 300, GameConfig.ANCHO_MUNDO, Align.center, false);
 	
 		game.getBatch().end();
 

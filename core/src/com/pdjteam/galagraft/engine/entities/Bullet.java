@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.pdjteam.galagraft.Galagraft;
+import com.pdjteam.galagraft.config.*;
 
 
 public class Bullet {
@@ -22,10 +22,10 @@ public class Bullet {
 	    }
 	    public void update() {
 	        spr.setPosition(spr.getX()+xSpeed, spr.getY()+ySpeed);
-	        if (spr.getX() < 0 || spr.getX()+spr.getWidth() > Galagraft.ANCHO_MUNDO)  {
+	        if (spr.getX() < 0 || spr.getX()+spr.getWidth() > GameConfig.ANCHO_MUNDO)  {
 	            destroyed = true;
 	        }
-	        if (spr.getY() < 0 || spr.getY()+spr.getHeight() > Galagraft.ALTO_MUNDO) {
+	        if (spr.getY() < 0 || spr.getY()+spr.getHeight() > GameConfig.ALTO_MUNDO) {
 	        	destroyed = true;
 	        }
 	        
@@ -35,7 +35,7 @@ public class Bullet {
 	    	spr.draw(batch);
 	    }
 	    
-	    public boolean checkCollision(Esqueletos b2) {
+	    public boolean checkCollision(Esqueleto b2) {
 	        if(spr.getBoundingRectangle().overlaps(b2.getArea())){
 	        	// Se destruyen ambos
 	            this.destroyed = true;

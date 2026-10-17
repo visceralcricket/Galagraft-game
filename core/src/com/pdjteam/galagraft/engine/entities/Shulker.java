@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.pdjteam.galagraft.view.PantallaJuego;
-import com.pdjteam.galagraft.Galagraft;
+import com.pdjteam.galagraft.config.*;
 import com.pdjteam.galagraft.engine.entities.Bullet;
 
 
@@ -62,9 +62,9 @@ public class Shulker {
 	        }*/
 	        
 	        // que se mantenga dentro de los bordes de la ventana
-	        if (x+xVel < 0 || x+xVel+spr.getWidth() > Galagraft.ANCHO_MUNDO)
+	        if (x+xVel < 0 || x+xVel+spr.getWidth() > GameConfig.ANCHO_MUNDO)
 	        	xVel*=-1;
-	        if (y+yVel < 0 || y+yVel+spr.getHeight() > Galagraft.ALTO_MUNDO)
+	        if (y+yVel < 0 || y+yVel+spr.getHeight() > GameConfig.ALTO_MUNDO)
 	        	yVel*=-1;
 	        
 	        spr.setPosition(x+xVel, y+yVel);   
@@ -86,7 +86,7 @@ public class Shulker {
        
     }
       
-    public boolean checkCollision(Esqueletos b) {
+    public boolean checkCollision(Esqueleto b) {
         if(!herido && b.getArea().overlaps(spr.getBoundingRectangle())){
         	// rebote
             if (xVel ==0) xVel += b.getXSpeed()/2;
