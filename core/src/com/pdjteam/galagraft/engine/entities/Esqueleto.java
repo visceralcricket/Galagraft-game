@@ -14,9 +14,12 @@ public class Esqueleto {
     private int xSpeed;
     private int ySpeed;
     private Sprite spr;
+    private Sprite proyectil;
 
     public Esqueleto(int x, int y, int size, int xSpeed, int ySpeed, Texture tx) {
     	spr = new Sprite(tx);
+    	float escala = (float) size / Math.max(tx.getWidth(), tx.getHeight());
+    	spr.setSize(tx.getWidth() * escala, tx.getHeight() * escala);
     	this.x = Math.max(0,  Math.min(x, (int)(GameConfig.ANCHO_MUNDO - spr.getWidth())));
     	this.y = Math.max(0,  Math.min(y, (int)(GameConfig.ALTO_MUNDO - spr.getWidth())));
     	

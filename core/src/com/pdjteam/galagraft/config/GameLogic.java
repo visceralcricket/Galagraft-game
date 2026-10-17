@@ -3,6 +3,7 @@ package com.pdjteam.galagraft.config;
 import java.util.ArrayList;
 import java.util.Random;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.Rectangle;
 import com.pdjteam.galagraft.engine.entities.*;
 
 public class GameLogic {
@@ -27,14 +28,31 @@ public class GameLogic {
 	private void crearEnemigos(Texture[] texEnemigos) {
 		Random r = new Random();
 		for (int i = 0; i < cantEnemigos; i++) {
-			Texture tex = texEnemigos[r.nextInt(texEnemigos.length)];
-			Esqueleto e = new Esqueleto(
-				r.nextInt(GameConfig.ANCHO_MUNDO),
-				50 + r.nextInt(GameConfig.ALTO_MUNDO - 50),
-				20 + r.nextInt(10), velX + r.nextInt(4), velY + r.nextInt(4), tex);
+			int tipo = r.nextInt(texEnemigos.length);
+			Texture tex = texEnemigos[tipo];
+			Esqueleto e;
+			int intentos = 0;
+			// Reintenta con otra posición hasta encontrar un lugar libre (o agotar los intentos)
+			do {
+				e = new Esqueleto(
+					r.nextInt(GameConfig.ANCHO_MUNDO),
+					50 + r.nextInt(GameConfig.ALTO_MUNDO - 50),
+					GameConfig.ENEMIGO_LADOS[tipo], velX + r.nextInt(4), velY + r.nextInt(4), tex);
+				intentos++;
+			} while (muyCerca(e) && intentos < GameConfig.ENEMIGO_INTENTOS_SPAWN);
 			mobs1.add(e);
 			mobs2.add(e);
 		}
+	}
+	
+	// Indica si el enemigo quedó a menos de la distancia mínima de otro ya creado
+	private boolean muyCerca(Esqueleto nuevo) {
+		float m = GameConfig.ENEMIGO_DISTANCIA_MIN;
+		Rectangle area = nuevo.getArea();
+		Rectangle zona = new Rectangle(area.x - m, area.y - m, area.width + 2 * m, area.height + 2 * m);
+		for (Esqueleto otro : mobs1)
+			if (zona.overlaps(otro.getArea())) return true;
+		return false;
 	}
 
 	// Avanza fotograma y devuelve cuantos enemigos fueron destruidos por las balas

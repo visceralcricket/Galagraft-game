@@ -27,6 +27,14 @@ public final class GameConfig {
 	public static final int BALA_ANCHO = 30;
 	public static final int BALA_ALTO = 20;
 	
+	// Tamaño de cada tipo de enemigo (lado mayor en px), en el mismo orden que las texturas:
+	// GRANDE (ghast), MEDIANO (esqueleto), PEQUENO (blaze). Los PNG miden 512x512 y se reducen a este lado.
+	public static final int[] ENEMIGO_LADOS = { 110, 80, 80 };
+	
+	// Separación mínima (px) entre enemigos al aparecer y reintentos para encontrar un lugar libre
+	public static final int ENEMIGO_DISTANCIA_MIN = 20;
+	public static final int ENEMIGO_INTENTOS_SPAWN = 50;
+	
 	// Assets
 	public static final String SND_EXPLOSION = "explosion.ogg";
 	public static final String SND_DANO = "hurt.ogg";
@@ -34,7 +42,7 @@ public final class GameConfig {
 	public static final String SND_MUSICA_JUEGO = "piano-loops.wav";
 	public static final String TEX_SHULKER = "shulker.png";
 	public static final String TEX_BALA = "bala.png";
-	public static final String TEX_ENEMIGO_GRANDE = "aGreyLarge.png";
-	public static final String TEX_ENEMIGO_MEDIANO = "aGreyMedium4.png";
-	public static final String TEX_ENEMIGO_PEQUENO = "aGreySmall.png";
+	public static final String TEX_ENEMIGO_GRANDE = "Ghast.png";
+	public static final String TEX_ENEMIGO_MEDIANO = "esqueleto.png";
+	public static final String TEX_ENEMIGO_PEQUENO = "Blaze.png";
 }
