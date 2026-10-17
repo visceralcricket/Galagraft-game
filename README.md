@@ -338,7 +338,8 @@ Fase en que se resuelve: **[F0]** se corrige ahora en el juego base; **[F1]** al
 
 ```diff
 @@ A nivel de renderizado / visual @@
-- [ALTO][F0] Resolución inconsistente
+
++ [ALTO] [F0] Resolución inconsistente [RESUELTA]
   (DesktopLauncher; PantallaMenu L20; PantallaGameOver L20; PantallaJuego L48)
   La ventana no tiene tamaño fijado (LWJGL3 usa 640x480 por defecto), pero
   las cámaras son de 1200x800 y 800x640. Las entidades se mueven según el
@@ -348,7 +349,7 @@ Fase en que se resuelve: **[F0]** se corrige ahora en el juego base; **[F1]** al
   menú en el batch compartido.
   Probable resultado: el juego ocupa solo una esquina. [Verificar visualmente]
 - [MEDIO][F2] Asteroides sobre la nave al iniciar la ronda
-  (PantallaJuego L67-70)
+  (PantallaJuego L67-70)  
   No hay zona segura: el choque resta una vida de inmediato.
 - [MEDIO][F2] Asteroides "pegados" (Ball2.checkCollision L52-65)
   Si siguen solapados tras el rebote, invierten su velocidad en cada

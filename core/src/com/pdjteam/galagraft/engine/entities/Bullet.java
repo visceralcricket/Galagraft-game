@@ -16,6 +16,7 @@ public class Bullet {
 	    
 	    public Bullet(float x, float y, int xSpeed, int ySpeed, Texture tx) {
 	    	spr = new Sprite(tx);
+	    	spr.setSize(GameConfig.BALA_ANCHO, GameConfig.BALA_ALTO);
 	    	spr.setPosition(x, y);
 	        this.xSpeed = xSpeed;
 	        this.ySpeed = ySpeed;

@@ -23,13 +23,17 @@ public final class GameConfig {
 	public static final float VOLUMEN_MUSICA = 0.1f;
 	public static final float VOLUMEN_EXPLOSION = 0.1f;
 	
+	// Tamaño de los disparos (bala.png mide 745x500, se escala para el juego)
+	public static final int BALA_ANCHO = 30;
+	public static final int BALA_ALTO = 20;
+	
 	// Assets
 	public static final String SND_EXPLOSION = "explosion.ogg";
 	public static final String SND_DANO = "hurt.ogg";
 	public static final String SND_DISPARO = "pop-sound.mp3";
 	public static final String SND_MUSICA_JUEGO = "piano-loops.wav";
-	public static final String TEX_SHULKER = "MainShip3.png";
-	public static final String TEX_BALA = "Rocket2.png";
+	public static final String TEX_SHULKER = "shulker.png";
+	public static final String TEX_BALA = "bala.png";
 	public static final String TEX_ENEMIGO_GRANDE = "aGreyLarge.png";
 	public static final String TEX_ENEMIGO_MEDIANO = "aGreyMedium4.png";
 	public static final String TEX_ENEMIGO_PEQUENO = "aGreySmall.png";
