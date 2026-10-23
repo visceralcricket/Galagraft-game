@@ -10,7 +10,7 @@ public final class GameConfig {
 	// Valores iniciales
 	public static final int VIDAS_INICIALES = 3;
 	public static final int ENEMIGOS_INICIAL = 10;
-	public static final int VEL_INICIAL = 1;
+	public static final int VEL_INICIAL = 150;
 	
 	// Progresión por cada ronda
 	public static final int ENEMIGOS_POR_RONDA = 10;
@@ -44,11 +44,14 @@ public final class GameConfig {
 	public static final String SND_EXPLOSION = "explosion.ogg";
 	public static final String SND_DANO = "hurt.ogg";
 	public static final String SND_DISPARO = "shulker_sound.mp3";
-	public static final String SND_DISPARO_J = "disparoJ_vorbis.ogg";
+	public static final String SND_DISPARO_J = "disparoJ.mp3";
 	public static final String SND_MUSICA_JUEGO = "piano-loops.wav";
 	public static final String TEX_SHULKER = "shulker.png";
 	public static final String TEX_BALA = "bala.png";
 	public static final String TEX_ENEMIGO_GRANDE = "Ghast.png";
 	public static final String TEX_ENEMIGO_MEDIANO = "esqueleto.png";
 	public static final String TEX_ENEMIGO_PEQUENO = "Blaze.png";
+	public static final String WPR_GAMEOVER = "game_over_screen.png";
+	public static final String WPR_GAMEOVER_TXT1 = "gameover1.png";
+	public static final String WPR_GAMEOVER_TXT2= "gameover2.png";
 }
