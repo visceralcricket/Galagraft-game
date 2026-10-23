@@ -84,7 +84,7 @@ public class Shulker extends EntidadDinamica {
  		 }
         // mecánica de disparo
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-        	Bullet  bala = new Bullet(spr.getX() + spr.getWidth()/2 - GameConfig.BALA_ANCHO/2, spr.getY() + spr.getHeight()-5, 0, 3, txBala);
+        	Bullet  bala = new Bullet(spr.getX() + spr.getWidth()/2 - GameConfig.BALA_ANCHO/2, spr.getY() + spr.getHeight()-5, 0, 10, txBala);
         	juego.agregarBala(bala);
         	// con probabilidad PROB_DISPARO_J suena disparoJ en lugar del sonido normal
         	if (MathUtils.random() < GameConfig.PROB_DISPARO_J) {
