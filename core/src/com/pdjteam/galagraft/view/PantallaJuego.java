@@ -32,6 +32,7 @@ public class PantallaJuego implements Screen {
 	private Texture texBala;
 	private Sound sndDano;
 	private Sound sndDisparo;
+	private Sound sndDisparoJ;
 
 	public PantallaJuego(Galagraft game, int ronda, int vidas, int puntuacion, int velXEnemigos, int velYEnemigos, int cantEnemigos) {
 		
@@ -56,10 +57,11 @@ public class PantallaJuego implements Screen {
 		};
 		sndDano = Gdx.audio.newSound(Gdx.files.internal(GameConfig.SND_DANO));
 		sndDisparo = Gdx.audio.newSound(Gdx.files.internal(GameConfig.SND_DISPARO));
+		sndDisparoJ = Gdx.audio.newSound(Gdx.files.internal(GameConfig.SND_DISPARO_J));
 		
 		
 	    // cargar imagen de la nave, 64x64   
-	    Shulker jugador = new Shulker(GameConfig.ANCHO_MUNDO/2-50,30, texShulker, sndDano, texBala, sndDisparo);
+	    Shulker jugador = new Shulker(GameConfig.ANCHO_MUNDO/2-50,30, texShulker, sndDano, texBala, sndDisparo, sndDisparoJ);
 	    jugador.setVidas(vidas);
         //crear asteroides
         logica = new GameLogic(jugador, ronda, puntuacion, velXEnemigos, velYEnemigos, cantEnemigos, texEnemigos);
@@ -166,6 +168,7 @@ public class PantallaJuego implements Screen {
 		for (Texture t : texEnemigos) t.dispose();
 		sndDano.dispose();
 		sndDisparo.dispose();
+		sndDisparoJ.dispose();
 	}
    
 }
