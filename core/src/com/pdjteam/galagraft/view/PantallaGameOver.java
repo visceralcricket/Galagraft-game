@@ -21,9 +21,11 @@ public class PantallaGameOver implements Screen {
 	private Texture fondo;
 	private Texture fondoTitulo;
 	private Texture fondoTexto;
+	private int puntuacion;
 
-	public PantallaGameOver(Galagraft game) {
+	public PantallaGameOver(Galagraft game, int puntuacion) {
 		this.game = game;
+		this.puntuacion = puntuacion;
         
 		camera = new OrthographicCamera();
 		viewport = new StretchViewport(GameConfig.ANCHO_MUNDO, GameConfig.ALTO_MUNDO, camera);
@@ -47,7 +49,7 @@ public class PantallaGameOver implements Screen {
 		// Fondo Game Over
 		game.getBatch().draw(fondo, 0, 0, GameConfig.ANCHO_MUNDO, GameConfig.ALTO_MUNDO);
 		
-		// Tamaños de los textos
+		// Tamaños y posiciones de los textos
 		float anchoTit = GameConfig.ANCHO_MUNDO * 0.5f;
 		float altoTit = anchoTit * fondoTitulo.getHeight() / fondoTitulo.getWidth();
 		
@@ -59,10 +61,15 @@ public class PantallaGameOver implements Screen {
 		float altoBloque = altoTit + separacion + altoTxt;
 		float yTxt = (GameConfig.ALTO_MUNDO - altoBloque) / 2;
 		float yTit = yTxt + altoTxt + separacion;
+		float yPuntaje = yTxt - 50;
 		
 		// Textos del fondo
 		game.getBatch().draw(fondoTitulo, (GameConfig.ANCHO_MUNDO - anchoTit) / 2, yTit, anchoTit, altoTit);
 		game.getBatch().draw(fondoTexto, (GameConfig.ANCHO_MUNDO - anchoTxt) / 2, yTxt, anchoTxt, altoTxt);
+		game.getFont().getData().setScale(1.5f);
+		game.getFont().draw(game.getBatch(), "Puntaje: " + puntuacion, 0, yPuntaje, GameConfig.ANCHO_MUNDO, Align.center, false);
+		game.getFont().draw(game.getBatch(), "Mejor puntaje: " + game.getHighScore(), 0, yPuntaje - 50, GameConfig.ANCHO_MUNDO, Align.center, false);
+		game.getFont().getData().setScale(1f);
 		
 		game.getBatch().end();
 
