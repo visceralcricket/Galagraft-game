@@ -69,7 +69,7 @@ public class PantallaJuego implements Screen {
     
 	public void dibujaEncabezado() {
 		CharSequence str = "Vidas: " + logica.getJugador().getVidas() +" Ronda: " + logica.getRonda();
-		game.getFont().getData().setScale(2f);		
+		game.getFont().getData().setScale(1f);		
 		game.getFont().draw(batch, str, 10, 30);
 		game.getFont().draw(batch, "Score:" + logica.getPuntuacion(), GameConfig.ANCHO_MUNDO-150, 30);
 		game.getFont().draw(batch, "HighScore:" + game.getHighScore(), GameConfig.ANCHO_MUNDO/2-100, 30);
@@ -111,7 +111,7 @@ public class PantallaJuego implements Screen {
 	    if (logica.juegoTerminado()) {
   			if (logica.getPuntuacion() > game.getHighScore())
   				game.setHighScore(logica.getPuntuacion());
-	    	Screen ss = new PantallaGameOver(game);
+	    	Screen ss = new PantallaGameOver(game, logica.getPuntuacion());
   			game.setScreen(ss);
   			dispose();
   			return;
@@ -131,6 +131,10 @@ public class PantallaJuego implements Screen {
     
     public boolean agregarBala(Bullet bb) {
     	return logica.agregarBala(bb);
+    }
+    
+    public boolean puedeDisparar() {
+    	return logica.puedeDisparar();
     }
 	
 	@Override

@@ -209,7 +209,8 @@ public class GameLogic {
 		return destruidos;
 	}
 
-	public boolean agregarBala(Bullet b) { return balas.add(b); }
+	public boolean puedeDisparar() { return balas.size() < GameConfig.MAX_BALAS; }
+	public boolean agregarBala(Bullet b) { return puedeDisparar() && balas.add(b); }
 	public boolean rondaCompletada( ) { return mobs1.isEmpty() && pendientes <= 0 && jugador.getVidas() > 0; }
 	public boolean juegoTerminado() { return jugador.estaDestruido(); }
 	public void eliminarEnemigo(int i) { mobs1.remove(i); }

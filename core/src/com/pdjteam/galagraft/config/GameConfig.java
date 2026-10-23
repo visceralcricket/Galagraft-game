@@ -12,6 +12,7 @@ public final class GameConfig {
 	public static final int ENEMIGOS_INICIAL = 10;
 	public static final int VEL_INICIAL = 5;
 	public static final int ENEMIGOS_MAX_PANTALLA_INICIAL = 10; // máximo de enemigos simultáneos en pantalla (ronda 1)
+	public static final int MAX_BALAS = 2;
 	
 	// Progresión por cada ronda (los porcentajes son respecto de la ronda anterior)
 	public static final float CRECIMIENTO_ENEMIGOS = 0.30f;     // enemigos totales de la ronda
@@ -23,8 +24,9 @@ public final class GameConfig {
 	public static final int PUNTOS_POR_ENEMIGO = 10;
 	
 	// Audio
-	public static final float VOLUMEN_MUSICA = 0.1f;
+	public static final float VOLUMEN_MUSICA = 0.5f;
 	public static final float VOLUMEN_EXPLOSION = 0.1f;
+	
 	// Probabilidad (0 a 1) de que al disparar suene disparoJ en vez del sonido normal
 	public static final float PROB_DISPARO_J = 0.1f;
 	
@@ -46,11 +48,12 @@ public final class GameConfig {
 	public static final int ENEMIGOS_POR_ESCAPE = 5;    // enemigos que se suman al total de la ronda por cada uno que llega al fondo
 	
 	// Assets
+	public static final String FUENTE = "minecraftia.fnt";
 	public static final String SND_EXPLOSION = "explosion.ogg";
 	public static final String SND_DANO = "hurt.ogg";
 	public static final String SND_DISPARO = "shulker_sound.mp3";
 	public static final String SND_DISPARO_J = "disparoJ.mp3";
-	public static final String SND_MUSICA_JUEGO = "piano-loops.wav";
+	public static final String SND_MUSICA_JUEGO = "music.mp3";
 	public static final String TEX_SHULKER = "shulker.png";
 	public static final String TEX_BALA = "bala.png";
 	public static final String TEX_ENEMIGO_GRANDE = "Ghast.png";
