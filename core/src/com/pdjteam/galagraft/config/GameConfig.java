@@ -22,6 +22,8 @@ public final class GameConfig {
 	// Audio
 	public static final float VOLUMEN_MUSICA = 0.1f;
 	public static final float VOLUMEN_EXPLOSION = 0.1f;
+	// Probabilidad (0 a 1) de que al disparar suene disparoJ en vez del sonido normal
+	public static final float PROB_DISPARO_J = 0.1f;
 	
 	// Tamaño de los disparos (bala.png mide 745x500, se escala para el juego)
 	public static final int BALA_ANCHO = 30;
@@ -31,14 +33,18 @@ public final class GameConfig {
 	// GRANDE (ghast), MEDIANO (esqueleto), PEQUENO (blaze). Los PNG miden 512x512 y se reducen a este lado.
 	public static final int[] ENEMIGO_LADOS = { 110, 80, 80 };
 	
-	// Separación mínima (px) entre enemigos al aparecer y reintentos para encontrar un lugar libre
-	public static final int ENEMIGO_DISTANCIA_MIN = 20;
-	public static final int ENEMIGO_INTENTOS_SPAWN = 50;
+	// Formación de enemigos (estilo Galaga): aparecen en filas desde la esquina superior izquierda,
+	// avanzan en bloque hacia un lado y, al tocar el borde, bajan un escalón y cambian de sentido
+	public static final int ENEMIGOS_POR_FILA = 10;
+	public static final int ENEMIGO_DISTANCIA_MIN = 20; // separación (px) entre enemigos de la formación
+	public static final int FORMACION_MARGEN = 20;      // distancia (px) a los bordes laterales y superior
+	public static final int ENEMIGO_ESCALON = 60;       // cuánto bajan (px) al tocar un borde
 	
 	// Assets
 	public static final String SND_EXPLOSION = "explosion.ogg";
 	public static final String SND_DANO = "hurt.ogg";
 	public static final String SND_DISPARO = "shulker_sound.mp3";
+	public static final String SND_DISPARO_J = "disparoJ_vorbis.ogg";
 	public static final String SND_MUSICA_JUEGO = "piano-loops.wav";
 	public static final String TEX_SHULKER = "shulker.png";
 	public static final String TEX_BALA = "bala.png";

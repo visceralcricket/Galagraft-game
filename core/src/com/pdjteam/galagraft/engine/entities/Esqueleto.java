@@ -28,30 +28,10 @@ public class Esqueleto {
         this.setYSpeed(ySpeed);
     }
     
-    public void update() {
-        x += getXSpeed();
-        y += getYSpeed();
-        
-        if (x < 0) {
-        	x = 0;
-        	setXSpeed(Math.abs(getXSpeed()));
-        } else if (x + spr.getWidth() > GameConfig.ANCHO_MUNDO) {
-        	x = (int)(GameConfig.ANCHO_MUNDO - spr.getWidth());
-        	setXSpeed(-Math.abs(getXSpeed()));
-        }
-        
-        if (y < 0) {
-        	y = 0;
-        	setXSpeed(Math.abs(getXSpeed()));
-        } else if (y + spr.getWidth() > GameConfig.ALTO_MUNDO) {
-        	y = (int)(GameConfig.ALTO_MUNDO - spr.getWidth());
-        	setYSpeed(-Math.abs(getYSpeed()));
-        }
-        
-        if (x+getXSpeed() < 0 || x+getXSpeed()+spr.getWidth() > GameConfig.ANCHO_MUNDO)
-        	setXSpeed(getXSpeed() * -1);
-        if (y+getYSpeed() < 0 || y+getYSpeed()+spr.getHeight() > GameConfig.ALTO_MUNDO)
-        	setYSpeed(getYSpeed() * -1);
+    // Desplaza al enemigo; el movimiento de toda la formación lo decide GameLogic
+    public void mover(int dx, int dy) {
+        x += dx;
+        y += dy;
         spr.setPosition(x, y);
     }
     

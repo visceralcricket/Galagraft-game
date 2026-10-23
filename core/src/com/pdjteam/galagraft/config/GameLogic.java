@@ -13,6 +13,7 @@ public class GameLogic {
 	private int puntuacion;
 	private int ronda;
 	private int velX, velY, cantEnemigos;
+	private int direccion = 1; // sentido de la formación: 1 = derecha, -1 = izquierda
 	
 	public GameLogic(Shulker jugador, int ronda, int puntuacion, int velX, int velY, int cantEnemigos, Texture[] texEnemigos) {
 		this.jugador = jugador;
@@ -24,33 +25,60 @@ public class GameLogic {
 		crearEnemigos(texEnemigos);
 	}
 	
+	// Crea los enemigos en formación de grilla: fila por fila, partiendo arriba a la izquierda
 	private void crearEnemigos(Texture[] texEnemigos) {
 		Random r = new Random();
+		int mayorLado = 0;
+		for (int lado : GameConfig.ENEMIGO_LADOS) mayorLado = Math.max(mayorLado, lado);
+		int celda = mayorLado + GameConfig.ENEMIGO_DISTANCIA_MIN;
+		
 		for (int i = 0; i < cantEnemigos; i++) {
+			int fila = i / GameConfig.ENEMIGOS_POR_FILA;
+			int columna = i % GameConfig.ENEMIGOS_POR_FILA;
 			int tipo = r.nextInt(texEnemigos.length);
-			Texture tex = texEnemigos[tipo];
-			Esqueleto e;
-			int intentos = 0;
-			// Reintenta con otra posición hasta encontrar un lugar libre (o agotar los intentos)
-			do {
-				e = new Esqueleto(
-					r.nextInt(GameConfig.ANCHO_MUNDO),
-					50 + r.nextInt(GameConfig.ALTO_MUNDO - 50),
-					GameConfig.ENEMIGO_LADOS[tipo], velX + r.nextInt(4), velY + r.nextInt(4), tex);
-				intentos++;
-			} while (muyCerca(e) && intentos < GameConfig.ENEMIGO_INTENTOS_SPAWN);
-			mobs1.add(e);
+			int lado = GameConfig.ENEMIGO_LADOS[tipo];
+			// cada enemigo queda centrado dentro de su celda
+			int x = GameConfig.FORMACION_MARGEN + columna * celda + (celda - lado) / 2;
+			int y = GameConfig.ALTO_MUNDO - GameConfig.FORMACION_MARGEN - (fila + 1) * celda + (celda - lado) / 2;
+			// la velocidad la maneja la formación (moverFormacion), no cada enemigo
+			mobs1.add(new Esqueleto(x, y, lado, 0, 0, texEnemigos[tipo]));
 		}
 	}
 	
-	// Indica si el enemigo quedó a menos de la distancia mínima de otro ya creado
-	private boolean muyCerca(Esqueleto nuevo) {
-		float m = GameConfig.ENEMIGO_DISTANCIA_MIN;
-		Rectangle area = nuevo.getArea();
-		Rectangle zona = new Rectangle(area.x - m, area.y - m, area.width + 2 * m, area.height + 2 * m);
-		for (Esqueleto otro : mobs1)
-			if (zona.overlaps(otro.getArea())) return true;
-		return false;
+	// Mueve toda la formación como un bloque: avanza en horizontal y, al llegar a un borde,
+	// baja un escalón y cambia de sentido. Los bordes se miden con los enemigos que siguen vivos.
+	private void moverFormacion() {
+		if (mobs1.isEmpty()) return;
+		
+		float izq = Float.MAX_VALUE, der = -Float.MAX_VALUE, abajo = Float.MAX_VALUE;
+		for (Esqueleto e : mobs1) {
+			Rectangle a = e.getArea();
+			izq = Math.min(izq, a.x);
+			der = Math.max(der, a.x + a.width);
+			abajo = Math.min(abajo, a.y);
+		}
+		
+		float limiteIzq = GameConfig.FORMACION_MARGEN;
+		float limiteDer = GameConfig.ANCHO_MUNDO - GameConfig.FORMACION_MARGEN;
+		
+		int dx = direccion * velX;
+		int dy = 0;
+		boolean tocaBorde = false;
+		if (dx > 0 && der + dx >= limiteDer) {
+			dx = Math.max(0, (int) (limiteDer - der)); // avanza solo hasta quedar justo en el borde
+			tocaBorde = true;
+		} else if (dx < 0 && izq + dx <= limiteIzq) {
+			dx = Math.min(0, (int) (limiteIzq - izq));
+			tocaBorde = true;
+		}
+		
+		if (tocaBorde) {
+			// baja un escalón sin salirse por abajo y vuelve en sentido contrario
+			dy = -Math.min(GameConfig.ENEMIGO_ESCALON, (int) abajo);
+			direccion = -direccion;
+		}
+		
+		for (Esqueleto e : mobs1) e.mover(dx, dy);
 	}
 
 	// Avanza fotograma y devuelve cuantos enemigos fueron destruidos por las balas
@@ -76,7 +104,7 @@ public class GameLogic {
 			}
 		}
 		
-		for(Esqueleto e : mobs1) e.update();
+		moverFormacion();
 		
 		// Sin rebote entre enemigos: un enemigo más rápido atraviesa al más lento y sigue su ruta
 		

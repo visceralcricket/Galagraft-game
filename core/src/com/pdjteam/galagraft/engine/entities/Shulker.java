@@ -24,15 +24,17 @@ public class Shulker extends EntidadDinamica {
     private Sprite spr;
     private Sound sonidoHerido;
     private Sound soundBala;
+    private Sound soundBalaJ;
     private Texture txBala;
     
     private boolean herido = false;
     private int tiempoHeridoMax = 50;
     private int tiempoHerido;
     
-    public Shulker(int x, int y, Texture tx, Sound soundChoque, Texture txBala, Sound soundBala) {
+    public Shulker(int x, int y, Texture tx, Sound soundChoque, Texture txBala, Sound soundBala, Sound soundBalaJ) {
     	this.sonidoHerido = soundChoque;
     	this.soundBala = soundBala;
+    	this.soundBalaJ = soundBalaJ;
     	this.txBala = txBala;
     	this.spr = new Sprite(tx);
     	this.spr.setBounds(x, y, 45, 45);
@@ -84,7 +86,12 @@ public class Shulker extends EntidadDinamica {
         if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
         	Bullet  bala = new Bullet(spr.getX() + spr.getWidth()/2 - GameConfig.BALA_ANCHO/2, spr.getY() + spr.getHeight()-5, 0, 3, txBala);
         	juego.agregarBala(bala);
-        	soundBala.play();
+        	// con probabilidad PROB_DISPARO_J suena disparoJ en lugar del sonido normal
+        	if (MathUtils.random() < GameConfig.PROB_DISPARO_J) {
+        		soundBalaJ.play();
+        	} else {
+        		soundBala.play();
+        	}
         }
     }
       
