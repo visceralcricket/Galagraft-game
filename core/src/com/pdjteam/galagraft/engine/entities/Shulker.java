@@ -95,7 +95,7 @@ public class Shulker extends EntidadDinamica {
         }
     }
       
-    public boolean checkCollision(Esqueleto b) {
+    public boolean checkCollision(Enemigo b) {
         if(!herido && b.getArea().overlaps(spr.getBoundingRectangle())) {
             vidas--;
             herido = true;

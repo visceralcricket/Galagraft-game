@@ -34,7 +34,7 @@ public class PantallaJuego implements Screen {
 	private Sound sndDisparo;
 	private Sound sndDisparoJ;
 
-	public PantallaJuego(Galagraft game, int ronda, int vidas, int puntuacion, int velXEnemigos, int velYEnemigos, int cantEnemigos) {
+	public PantallaJuego(Galagraft game, int ronda, int vidas, int puntuacion, int velXEnemigos, int velYEnemigos, int cantEnemigos, int maxEnPantalla) {
 		
 		this.game = game;
 		batch = game.getBatch();
@@ -64,7 +64,7 @@ public class PantallaJuego implements Screen {
 	    Shulker jugador = new Shulker(GameConfig.ANCHO_MUNDO/2-50,30, texShulker, sndDano, texBala, sndDisparo, sndDisparoJ);
 	    jugador.setVidas(vidas);
         //crear asteroides
-        logica = new GameLogic(jugador, ronda, puntuacion, velXEnemigos, velYEnemigos, cantEnemigos, texEnemigos);
+        logica = new GameLogic(jugador, ronda, puntuacion, velXEnemigos, velYEnemigos, cantEnemigos, maxEnPantalla, texEnemigos);
 	}
     
 	public void dibujaEncabezado() {
@@ -82,7 +82,7 @@ public class PantallaJuego implements Screen {
 		camera.update();
 		batch.setProjectionMatrix(camera.combined);
 		
-		if (logica.actualizar() > 0) {
+		if (logica.actualizar(delta) > 0) {
 			explosionSound.play(GameConfig.VOLUMEN_EXPLOSION);
 		}
 		
@@ -94,9 +94,9 @@ public class PantallaJuego implements Screen {
 	    }
 	    logica.getJugador().draw(batch, this);
 	    //dibujar asteroides y manejar colision con nave
-	    ArrayList<Esqueleto> enemigos = logica.getEnemigos();
+	    ArrayList<Enemigo> enemigos = logica.getEnemigos();
 	    for (int i = 0; i < enemigos.size(); i++) {
-	    	Esqueleto e = enemigos.get(i);
+	    	Enemigo e = enemigos.get(i);
 	    	e.draw(batch);
 		    //perdió vida o game over
 	        if (logica.getJugador().checkCollision(e)) {
@@ -119,8 +119,11 @@ public class PantallaJuego implements Screen {
 	    // Ronda completada
 	    if (logica.rondaCompletada()) {
 			Screen ss = new PantallaJuego(game, logica.getRonda()+1, logica.getJugador().getVidas(),
-					logica.getPuntuacion(), logica.getVelX() + GameConfig.VEL_POR_RONDA, 
-					logica.getVelY() + GameConfig.VEL_POR_RONDA, logica.getCantEnemigos() + GameConfig.ENEMIGOS_POR_RONDA);
+					logica.getPuntuacion(),
+					Math.min(GameConfig.VEL_MAX, logica.getVelX() + GameConfig.VEL_POR_RONDA),
+					Math.min(GameConfig.VEL_MAX, logica.getVelY() + GameConfig.VEL_POR_RONDA),
+					Math.round(logica.getCantEnemigos() * (1 + GameConfig.CRECIMIENTO_ENEMIGOS)),
+					Math.round(logica.getMaxEnPantalla() * (1 + GameConfig.CRECIMIENTO_MAX_PANTALLA)));
 			game.setScreen(ss);
 			dispose();
 	    }
