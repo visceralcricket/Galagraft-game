@@ -33,7 +33,7 @@ public class PantallaMenu implements Screen {
 
 		game.getBatch().begin();
 		game.getFont().draw(game.getBatch(), "Bienvenido a Galagraft !", 0, GameConfig.ALTO_MUNDO / 2, GameConfig.ANCHO_MUNDO, Align.center, false);
-		game.getFont().draw(game.getBatch(), "Pincha en cualquier lado o presiona cualquier tecla para comenzar ...", 0, GameConfig.ALTO_MUNDO / 2 - 100, GameConfig.ANCHO_MUNDO, Align.center, false);
+		game.getFont().draw(game.getBatch(), "Presiona en cualquier lado o presiona cualquier tecla para comenzar ...", 0, GameConfig.ALTO_MUNDO / 2 - 100, GameConfig.ANCHO_MUNDO, Align.center, false);
 	
 		game.getBatch().end();
 

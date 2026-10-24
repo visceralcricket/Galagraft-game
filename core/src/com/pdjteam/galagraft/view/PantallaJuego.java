@@ -26,6 +26,7 @@ public class PantallaJuego implements Screen {
 	private GameLogic logica;
 	private Texture[] texEnemigos;
 	
+	private Texture fondo;
 	private Sound explosionSound;
 	private Music gameMusic;
 	private Texture texShulker;
@@ -43,6 +44,7 @@ public class PantallaJuego implements Screen {
 		//inicializar assets; musica de fondo y efectos de sonido
 		explosionSound = Gdx.audio.newSound(Gdx.files.internal(GameConfig.SND_EXPLOSION));
 		gameMusic = Gdx.audio.newMusic(Gdx.files.internal(GameConfig.SND_MUSICA_JUEGO));
+		fondo = new Texture(Gdx.files.internal(GameConfig.WPR_GAMEPLAY));
 		
 		gameMusic.setLooping(true);
 		gameMusic.setVolume(GameConfig.VOLUMEN_MUSICA);
@@ -87,9 +89,12 @@ public class PantallaJuego implements Screen {
 		}
 		
         batch.begin();
+        batch.setColor(1f, 1f, 1f, 0.5f); 
+        batch.draw(fondo, 0, 0, GameConfig.ANCHO_MUNDO, GameConfig.ALTO_MUNDO);
+        batch.setColor(1f, 1f, 1f, 1f); 
 		dibujaEncabezado();
 	    //dibujar balas
-	    for (Bullet b : logica.getBalas()) {       
+	    for (Bullet b : logica.getBalas()) {
 	        b.draw(batch);
 	    }
 	    logica.getJugador().draw(batch, this);
@@ -173,6 +178,7 @@ public class PantallaJuego implements Screen {
 		sndDano.dispose();
 		sndDisparo.dispose();
 		sndDisparoJ.dispose();
+		fondo.dispose();
 	}
    
 }

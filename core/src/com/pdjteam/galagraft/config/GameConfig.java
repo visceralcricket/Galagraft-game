@@ -54,6 +54,7 @@ public final class GameConfig {
 	public static final String TEX_ENEMIGO_GRANDE = "Ghast.png";
 	public static final String TEX_ENEMIGO_MEDIANO = "esqueleto.png";
 	public static final String TEX_ENEMIGO_PEQUENO = "Blaze.png";
+	public static final String WPR_GAMEPLAY = "gameplay_wallpaper.png";
 	public static final String WPR_GAMEOVER = "game_over_screen.png";
 	public static final String WPR_GAMEOVER_TXT1 = "gameover1.png";
 	public static final String WPR_GAMEOVER_TXT2= "gameover2.png";
