@@ -63,7 +63,7 @@ public class PantallaJuego implements Screen {
 		
 		
 	    // cargar imagen de la nave, 64x64   
-	    Shulker jugador = new Shulker(GameConfig.ANCHO_MUNDO/2-50,30, texShulker, sndDano, texBala, sndDisparo, sndDisparoJ);
+	    Shulker jugador = new Shulker(GameConfig.ANCHO_MUNDO/2-50,60, texShulker, sndDano, texBala, sndDisparo, sndDisparoJ);
 	    jugador.setVidas(vidas);
         //crear asteroides
         logica = new GameLogic(jugador, ronda, puntuacion, velXEnemigos, velYEnemigos, cantEnemigos, texEnemigos);
@@ -141,7 +141,7 @@ public class PantallaJuego implements Screen {
 	
 	@Override
 	public void show() {
-		gameMusic.play();
+		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -152,13 +152,13 @@ public class PantallaJuego implements Screen {
 
 	@Override
 	public void pause() {
-		gameMusic.pause();
+		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void resume() {
-		gameMusic.play();
+		// TODO Auto-generated method stub
 		
 	}
 
