@@ -1,5 +1,6 @@
 package com.pdjteam.galagraft.engine.entities;
 
+import java.util.ArrayList;
 import java.util.List;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -13,6 +14,7 @@ import com.pdjteam.galagraft.config.GameConfig;
 // strategies
 import com.pdjteam.galagraft.strategies.DisparoSimpleStrategy;
 import com.pdjteam.galagraft.strategies.EstrategiaDisparo;
+import com.pdjteam.galagraft.strategies.EstrategiaPotenciador;
 
 // Interfaz
 import com.pdjteam.galagraft.interfaces.Colisionable;
@@ -25,7 +27,7 @@ public class Shulker extends EntidadDinamica {
     // atributos encapsulados: GM-5
     private int puntaje;
     private float tiempoDesdeUltimoDisparo;
-    private float tiempoPowerUpRestante;
+    private final List<EfectoActivo> efectosActivos = new ArrayList<>(); // potenciadores en curso (Strategy GM-7)
     private EstrategiaDisparo estrategiaDisparo; // referencia a Strategy (GM-7)
     private Texture texturaBala;
     private Sound sonidoDisparo;
@@ -33,12 +35,22 @@ public class Shulker extends EntidadDinamica {
     private Sound sonidoHurt;
     private List<Proyectil> proyectilesJuego;
 
+    // Un potenciador temporal en curso: su estrategia y los segundos que le quedan
+    private static class EfectoActivo {
+        private final EstrategiaPotenciador estrategia;
+        private float restante;
+
+        EfectoActivo(EstrategiaPotenciador estrategia, float restante) {
+            this.estrategia = estrategia;
+            this.restante = restante;
+        }
+    }
+
     private Shulker(float x, float y, Texture texturaJugador, Texture texturaBala, 
                     Sound sonidoDisparo, Sound sonidoDisparoJ, Sound sonidoHurt, List<Proyectil> proyectiles) {
         super(x, y, 500f, 0f, GameConfig.VIDAS_INICIALES, texturaJugador);
         this.puntaje = 0;
         this.tiempoDesdeUltimoDisparo = 0f;
-        this.tiempoPowerUpRestante = 0f;
         this.estrategiaDisparo = new DisparoSimpleStrategy();
         this.texturaBala = texturaBala;
         this.sonidoDisparo = sonidoDisparo;
@@ -75,7 +87,8 @@ public class Shulker extends EntidadDinamica {
         this.sonidoHurt = sHurt;
         this.proyectilesJuego = proyectiles;
         this.tiempoDesdeUltimoDisparo = 0f;
-        this.tiempoPowerUpRestante = 0f;
+        // los potenciadores no pasan de una ronda a otra: se revierten sus efectos
+        revertirEfectosActivos();
         this.estrategiaDisparo = new DisparoSimpleStrategy();
 
         if(texJugador != null) {
@@ -89,9 +102,61 @@ public class Shulker extends EntidadDinamica {
         setActiva(true);
     }
 
-    public void aplicarPowerUp(EstrategiaDisparo nuevaEstrategia, float duracionSegundos) {
-        this.estrategiaDisparo = nuevaEstrategia;
-        this.tiempoPowerUpRestante = duracionSegundos;
+    /**
+     * Activa un potenciador (Strategy GM-7): aplica su efecto y, si es temporal, lo revierte al expirar.
+     * Solo hay un efecto activo por categoría: el nuevo reemplaza al anterior.
+     */
+    public void activarPotenciador(EstrategiaPotenciador nuevo) {
+        if(nuevo == null) return;
+
+        for(int i = efectosActivos.size() - 1; i >= 0; i--) {
+            EfectoActivo activo = efectosActivos.get(i);
+            if(activo.estrategia.getCategoria().equals(nuevo.getCategoria())) {
+                activo.estrategia.revertir(this);
+                efectosActivos.remove(i);
+            }
+        }
+
+        nuevo.aplicar(this);
+
+        // duración 0 = efecto instantáneo (p. ej. vida extra): no hay nada que revertir después
+        if(nuevo.getDuracion() > 0) {
+            efectosActivos.add(new EfectoActivo(nuevo, nuevo.getDuracion()));
+        }
+    }
+
+    private void actualizarEfectosActivos(float delta) {
+        for(int i = efectosActivos.size() - 1; i >= 0; i--) {
+            EfectoActivo activo = efectosActivos.get(i);
+            activo.restante -= delta;
+            if(activo.restante <= 0) {
+                activo.estrategia.revertir(this);
+                efectosActivos.remove(i);
+            }
+        }
+    }
+
+    private void revertirEfectosActivos() {
+        for(EfectoActivo activo : efectosActivos) {
+            activo.estrategia.revertir(this);
+        }
+        efectosActivos.clear();
+    }
+
+    /**
+     * Regla de munición: MAX_BALAS cuenta solo las balas del jugador (las enemigas no)
+     * y se ignora mientras hay un potenciador de disparo activo.
+     */
+    public boolean hayCupoDeBalas() {
+        for(EfectoActivo activo : efectosActivos) {
+            if(EstrategiaPotenciador.CATEGORIA_DISPARO.equals(activo.estrategia.getCategoria())) return true;
+        }
+
+        int balasJugador = 0;
+        for(Proyectil p : this.proyectilesJuego) {
+            if(p.isEsDelJugador()) balasJugador++;
+        }
+        return balasJugador < GameConfig.MAX_BALAS;
     }
 
     @Override
@@ -100,12 +165,7 @@ public class Shulker extends EntidadDinamica {
 
         this.tiempoDesdeUltimoDisparo += delta;
 
-        if(this.tiempoPowerUpRestante > 0) {
-            this.tiempoPowerUpRestante -= delta;
-            if(this.tiempoPowerUpRestante <= 0) {
-                this.estrategiaDisparo = new DisparoSimpleStrategy();
-            }
-        }
+        actualizarEfectosActivos(delta);
 
         if(Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
             setX(getX() - getVelocidadX() * delta);
@@ -123,7 +183,7 @@ public class Shulker extends EntidadDinamica {
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && 
             this.tiempoDesdeUltimoDisparo >= this.estrategiaDisparo.getTiempoEnfriamiento() &&
-            this.proyectilesJuego.size() < GameConfig.MAX_BALAS) {
+            hayCupoDeBalas()) {
 
             this.estrategiaDisparo.ejecutarDisparo(this, this.proyectilesJuego, this.texturaBala);
 
@@ -161,9 +221,6 @@ public class Shulker extends EntidadDinamica {
     
     public float getTiempoDesdeUltimoDisparo() { return tiempoDesdeUltimoDisparo; }
     public void setTiempoDesdeUltimoDisparo(float t) { this.tiempoDesdeUltimoDisparo = t; }
-    
-    public float getTiempoPowerUpRestante() { return tiempoPowerUpRestante; }
-    public void setTiempoPowerUpRestante(float t) { this.tiempoPowerUpRestante = t; }
     
     public EstrategiaDisparo getEstrategiaDisparo() { return estrategiaDisparo; }
     public void setEstrategiaDisparo(EstrategiaDisparo estrategia) { this.estrategiaDisparo = estrategia; }
