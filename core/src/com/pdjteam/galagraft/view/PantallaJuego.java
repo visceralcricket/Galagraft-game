@@ -39,9 +39,9 @@ public class PantallaJuego implements Screen {
 	private Sound sndDisparo;
 	private Sound sndDisparoJ;
 	private boolean pausado = false;
+	private boolean recursosLiberados = false;
 
 	public PantallaJuego(Galagraft game, int ronda, int vidas, int puntuacion, int velXEnemigos, int velYEnemigos, int cantEnemigos, int maxEnPantalla) {
-		
 		this.game = game;
 		this.batch = game.getBatch();
 		this.camera = new OrthographicCamera();
@@ -67,8 +67,8 @@ public class PantallaJuego implements Screen {
 		sndDisparo = Gdx.audio.newSound(Gdx.files.internal(GameConfig.SND_DISPARO));
 		sndDisparoJ = Gdx.audio.newSound(Gdx.files.internal(GameConfig.SND_DISPARO_J));
 		
-		Shulker.inicializarInstancia(
-				GameConfig.ANCHO_MUNDO / 2f - 50f, 
+		Shulker jugador = Shulker.inicializarInstancia(
+				GameConfig.ANCHO_MUNDO / 2f - 40f, 
 				60f, 
 				texShulker, 
 				texBala, 
@@ -76,39 +76,41 @@ public class PantallaJuego implements Screen {
 				sndDano, 
 				proyectiles
 		);
-		Shulker jugador = Shulker.getInstancia();
-		jugador.setVidaMaxima(vidas);
+		jugador.setVidaMaxima(Math.max(vidas, GameConfig.VIDAS_INICIALES));
 		jugador.setVida(vidas);
+		jugador.setPuntaje(puntuacion);
 
 		logica = new GameLogic(jugador, ronda, puntuacion, velXEnemigos, velYEnemigos, cantEnemigos, maxEnPantalla, texEnemigos);
 	}
     
 	public void dibujaEncabezado() {
-		CharSequence str = "Vidas: " + Shulker.getInstancia().getVida() + " Ronda: " + logica.getRonda()
-				+ " | Arma: " + Shulker.getInstancia().getEstrategiaDisparo().getNombreEstrategia();
+		CharSequence str = "Vidas: " + logica.getJugador().getVida() + " Ronda: " + logica.getRonda()
+				+ " | Arma: " + logica.getJugador().getEstrategiaDisparo().getNombreEstrategia();
 		game.getFont().getData().setScale(1f);		
 		game.getFont().draw(batch, str, 10, 30);
-		game.getFont().draw(batch, "Score:" + logica.getPuntuacion(), GameConfig.ANCHO_MUNDO - 150, 30);
+		game.getFont().draw(batch, "Score:" + logica.getPuntuacion(), GameConfig.ANCHO_MUNDO - 250, 30);
 		game.getFont().draw(batch, "HighScore:" + game.getHighScore(), GameConfig.ANCHO_MUNDO / 2f - 100, 30);
 	}
 	
 	@Override
 	public void render(float delta) {
+		// cierre seguro sin crashear OpenGL
 		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+			gameMusic.stop();
 			Gdx.app.exit();
 			return;
 		}
 
-		// alternar pausa con P
+		// Pausa con tecla P
 		if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
 			pausado = !pausado;
 			if (pausado) gameMusic.pause();
 			else gameMusic.play();
 		}
 
-		// activar Power-Up de disparo triple con tecla E
+		// Power-Up (Strategy GM-7) con tecla E
 		if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-			Shulker.getInstancia().aplicarPowerUp(new DisparoTriplePowerUpStrategy(), 10f);
+			logica.getJugador().aplicarPowerUp(new DisparoTriplePowerUpStrategy(), 10f);
 		}
 
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -117,12 +119,7 @@ public class PantallaJuego implements Screen {
 		batch.setProjectionMatrix(camera.combined);
 		
 		if (!pausado) {
-			Shulker.getInstancia().actualizar(delta);
-			for (Proyectil p : proyectiles) {
-				p.actualizar(delta);
-			}
-			proyectiles.removeIf(p -> !p.estaActiva());
-
+			logica.getJugador().actualizar(delta);
 			if (logica.actualizar(delta) > 0) {
 				explosionSound.play(GameConfig.VOLUMEN_EXPLOSION);
 			}
@@ -134,22 +131,19 @@ public class PantallaJuego implements Screen {
 		batch.setColor(1f, 1f, 1f, 1f); 
 		dibujaEncabezado();
 
+		// dibujar proyectiles solo una vez
 		for (Proyectil b : logica.getBalas()) {
 			b.dibujar(batch);
 		}
 
-		for (Proyectil p : proyectiles) {
-			p.dibujar(batch);
-		}
-
-		Shulker.getInstancia().dibujar(batch);
+		logica.getJugador().dibujar(batch);
 
 		ArrayList<Enemigo> enemigos = logica.getEnemigos();
 		for (int i = 0; i < enemigos.size(); i++) {
 			Enemigo e = enemigos.get(i);
 			e.dibujar(batch);
-			if (!pausado && Shulker.getInstancia().verificarColision(e)) {
-				Shulker.getInstancia().alColisionar(e);
+			if (!pausado && logica.getJugador().verificarColision(e)) {
+				logica.getJugador().alColisionar(e);
 				logica.eliminarEnemigo(i);
 				i--;
 			}   	  
@@ -163,33 +157,36 @@ public class PantallaJuego implements Screen {
 		if (!pausado && logica.juegoTerminado()) {
 			if (logica.getPuntuacion() > game.getHighScore())
 				game.setHighScore(logica.getPuntuacion());
-			Screen ss = new PantallaGameOver(game, logica.getPuntuacion());
-			game.setScreen(ss);
-			dispose();
+			game.setScreen(new PantallaGameOver(game, logica.getPuntuacion()));
 			return;
 		}
 
 		if (!pausado && logica.rondaCompletada()) {
-			Screen ss = new PantallaJuego(game, logica.getRonda() + 1, Shulker.getInstancia().getVida(),
+			Screen ss = new PantallaJuego(game, logica.getRonda() + 1, logica.getJugador().getVida(),
 					logica.getPuntuacion(),
 					Math.min(GameConfig.VEL_MAX, logica.getVelX() + GameConfig.VEL_POR_RONDA),
 					Math.min(GameConfig.VEL_MAX, logica.getVelY() + GameConfig.VEL_POR_RONDA),
 					Math.round(logica.getCantEnemigos() * (1 + GameConfig.CRECIMIENTO_ENEMIGOS)),
 					Math.round(logica.getMaxEnPantalla() * (1 + GameConfig.CRECIMIENTO_MAX_PANTALLA)));
 			game.setScreen(ss);
-			dispose();
 		}
 	}
     
-	public boolean agregarBala(Proyectil bb) { return logica.agregarBala(bb); }
+	public boolean agregarBala(Proyectil bb) {
+		return logica.agregarBala(bb);
+	}
     
-	public boolean puedeDisparar() { return logica.puedeDisparar(); }
+	public boolean puedeDisparar() {
+		return logica.puedeDisparar();
+	}
 	
 	@Override
 	public void show() {}
 
 	@Override
-	public void resize(int width, int height) { viewport.update(width, height, true); }
+	public void resize(int width, int height) {
+		viewport.update(width, height, true);
+	}
 
 	@Override
 	public void pause() {}
@@ -198,10 +195,12 @@ public class PantallaJuego implements Screen {
 	public void resume() {}
 
 	@Override
-	public void hide() {}
+	public void hide() { dispose(); }
 
 	@Override
 	public void dispose() {
+		if (recursosLiberados) return;
+		recursosLiberados = true;
 		explosionSound.dispose();
 		gameMusic.dispose();
 		texShulker.dispose();

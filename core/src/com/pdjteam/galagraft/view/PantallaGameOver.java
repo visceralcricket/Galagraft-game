@@ -45,10 +45,9 @@ public class PantallaGameOver implements Screen {
 		
 		game.getBatch().begin();
 		
-		// Fondo Game Over
+		// fondo Game Over
 		game.getBatch().draw(fondo, 0, 0, GameConfig.ANCHO_MUNDO, GameConfig.ALTO_MUNDO);
 		
-		// Tamaños y posiciones de los textos
 		float anchoTit = GameConfig.ANCHO_MUNDO * 0.5f;
 		float altoTit = anchoTit * fondoTitulo.getHeight() / fondoTitulo.getWidth();
 		
@@ -62,7 +61,7 @@ public class PantallaGameOver implements Screen {
 		float yTit = yTxt + altoTxt + separacion;
 		float yPuntaje = yTxt - 50;
 		
-		// Textos del fondo
+		// texto
 		game.getBatch().draw(fondoTitulo, (GameConfig.ANCHO_MUNDO - anchoTit) / 2, yTit, anchoTit, altoTit);
 		game.getBatch().draw(fondoTexto, (GameConfig.ANCHO_MUNDO - anchoTxt) / 2, yTxt, anchoTxt, altoTxt);
 		game.getFont().getData().setScale(1.5f);
@@ -78,6 +77,18 @@ public class PantallaGameOver implements Screen {
 		}
 		
 		if (Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY)) {
+			Screen ss = new PantallaJuego(game, 1, GameConfig.VIDAS_INICIALES, 0, GameConfig.VEL_INICIAL, GameConfig.VEL_INICIAL, GameConfig.ENEMIGOS_INICIAL, GameConfig.ENEMIGOS_MAX_PANTALLA_INICIAL);
+			game.setScreen(ss);
+			dispose();
+		}
+		
+		// Asegurarse de cerrar correctamente el juego
+		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+			Gdx.app.exit();
+			return;
+		}
+		
+		if (Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(Input.Keys.ENTER) || Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
 			Screen ss = new PantallaJuego(game, 1, GameConfig.VIDAS_INICIALES, 0, GameConfig.VEL_INICIAL, GameConfig.VEL_INICIAL, GameConfig.ENEMIGOS_INICIAL, GameConfig.ENEMIGOS_MAX_PANTALLA_INICIAL);
 			game.setScreen(ss);
 			dispose();
