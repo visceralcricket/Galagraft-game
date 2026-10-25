@@ -8,15 +8,16 @@ import com.badlogic.gdx.math.Rectangle;
 import com.pdjteam.galagraft.config.*;
 
 
-public class Esqueleto {
+public class Enemigo {
 	private int x;
     private int y;
     private int xSpeed;
     private int ySpeed;
     private Sprite spr;
     private Sprite proyectil;
+    private int fila; // fila de la formación a la que pertenece
 
-    public Esqueleto(int x, int y, int size, int xSpeed, int ySpeed, Texture tx) {
+    public Enemigo(int x, int y, int size, int xSpeed, int ySpeed, Texture tx) {
     	spr = new Sprite(tx);
     	float escala = (float) size / Math.max(tx.getWidth(), tx.getHeight());
     	spr.setSize(tx.getWidth() * escala, tx.getHeight() * escala);
@@ -35,6 +36,9 @@ public class Esqueleto {
         spr.setPosition(x, y);
     }
     
+    public int getFila() { return fila; }
+    public void setFila(int fila) { this.fila = fila; }
+    
     public Rectangle getArea() {
     	return spr.getBoundingRectangle();
     }
@@ -42,7 +46,7 @@ public class Esqueleto {
     	spr.draw(batch);
     }
     
-    public void checkCollision(Esqueleto b2) {
+    public void checkCollision(Enemigo b2) {
         if(spr.getBoundingRectangle().overlaps(b2.spr.getBoundingRectangle())){
         	// rebote
             if (getXSpeed() ==0) setXSpeed(getXSpeed() + b2.getXSpeed()/2);

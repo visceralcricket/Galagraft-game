@@ -19,7 +19,7 @@ public class Shulker extends EntidadDinamica {
 	private boolean destruida = false;
     private int vidas = 3;
     private float xVel = 0;
-    private final float VELOCIDAD_NAVE = 6f; // velocidad fija manejable
+    private final float VELOCIDAD_NAVE = 8f; // velocidad fija manejable
     
     private Sprite spr;
     private Sound sonidoHerido;
@@ -83,8 +83,8 @@ public class Shulker extends EntidadDinamica {
         	if (tiempoHerido <= 0) herido = false;
  		 }
         // mecánica de disparo
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-        	Bullet  bala = new Bullet(spr.getX() + spr.getWidth()/2 - GameConfig.BALA_ANCHO/2, spr.getY() + spr.getHeight()-5, 0, 10, txBala);
+        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && juego.puedeDisparar()) {
+        	Bullet  bala = new Bullet(spr.getX() + spr.getWidth()/2 - GameConfig.BALA_ANCHO/2, spr.getY() + spr.getHeight()-5, 0, 12, txBala);
         	juego.agregarBala(bala);
         	// con probabilidad PROB_DISPARO_J suena disparoJ en lugar del sonido normal
         	if (MathUtils.random() < GameConfig.PROB_DISPARO_J) {
@@ -95,7 +95,7 @@ public class Shulker extends EntidadDinamica {
         }
     }
       
-    public boolean checkCollision(Esqueleto b) {
+    public boolean checkCollision(Enemigo b) {
         if(!herido && b.getArea().overlaps(spr.getBoundingRectangle())) {
             vidas--;
             herido = true;
