@@ -36,7 +36,12 @@ public class PantallaMenu implements Screen {
 		game.getFont().draw(game.getBatch(), "Presiona en cualquier lado o presiona cualquier tecla para comenzar ...", 0, GameConfig.ALTO_MUNDO / 2 - 100, GameConfig.ANCHO_MUNDO, Align.center, false);
 	
 		game.getBatch().end();
-
+		
+		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+		    Gdx.app.exit();
+		    return;
+		}
+		
 		if (Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY)) {
 			Screen ss = new PantallaJuego(game, 1, GameConfig.VIDAS_INICIALES, 0, GameConfig.VEL_INICIAL, GameConfig.VEL_INICIAL, GameConfig.ENEMIGOS_INICIAL, GameConfig.ENEMIGOS_MAX_PANTALLA_INICIAL);
 			game.setScreen(ss);
