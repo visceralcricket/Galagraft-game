@@ -26,6 +26,7 @@ public class PantallaJuego implements Screen {
 	private GameLogic logica;
 	private Texture[] texEnemigos;
 	
+	private Texture fondo;
 	private Sound explosionSound;
 	private Music gameMusic;
 	private Texture texShulker;
@@ -43,6 +44,7 @@ public class PantallaJuego implements Screen {
 		//inicializar assets; musica de fondo y efectos de sonido
 		explosionSound = Gdx.audio.newSound(Gdx.files.internal(GameConfig.SND_EXPLOSION));
 		gameMusic = Gdx.audio.newMusic(Gdx.files.internal(GameConfig.SND_MUSICA_JUEGO));
+		fondo = new Texture(Gdx.files.internal(GameConfig.WPR_GAMEPLAY));
 		
 		gameMusic.setLooping(true);
 		gameMusic.setVolume(GameConfig.VOLUMEN_MUSICA);
@@ -61,7 +63,7 @@ public class PantallaJuego implements Screen {
 		
 		
 	    // cargar imagen de la nave, 64x64   
-	    Shulker jugador = new Shulker(GameConfig.ANCHO_MUNDO/2-50,30, texShulker, sndDano, texBala, sndDisparo, sndDisparoJ);
+	    Shulker jugador = new Shulker(GameConfig.ANCHO_MUNDO/2-50,60, texShulker, sndDano, texBala, sndDisparo, sndDisparoJ);
 	    jugador.setVidas(vidas);
         //crear asteroides
         logica = new GameLogic(jugador, ronda, puntuacion, velXEnemigos, velYEnemigos, cantEnemigos, maxEnPantalla, texEnemigos);
@@ -87,9 +89,12 @@ public class PantallaJuego implements Screen {
 		}
 		
         batch.begin();
+        batch.setColor(1f, 1f, 1f, 0.5f); 
+        batch.draw(fondo, 0, 0, GameConfig.ANCHO_MUNDO, GameConfig.ALTO_MUNDO);
+        batch.setColor(1f, 1f, 1f, 1f); 
 		dibujaEncabezado();
 	    //dibujar balas
-	    for (Bullet b : logica.getBalas()) {       
+	    for (Bullet b : logica.getBalas()) {
 	        b.draw(batch);
 	    }
 	    logica.getJugador().draw(batch, this);
@@ -139,7 +144,7 @@ public class PantallaJuego implements Screen {
 	
 	@Override
 	public void show() {
-		gameMusic.play();
+		// TODO Auto-generated method stub
 	}
 
 	@Override
@@ -150,13 +155,13 @@ public class PantallaJuego implements Screen {
 
 	@Override
 	public void pause() {
-		gameMusic.pause();
+		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void resume() {
-		gameMusic.play();
+		// TODO Auto-generated method stub
 		
 	}
 
@@ -176,6 +181,7 @@ public class PantallaJuego implements Screen {
 		sndDano.dispose();
 		sndDisparo.dispose();
 		sndDisparoJ.dispose();
+		fondo.dispose();
 	}
    
 }

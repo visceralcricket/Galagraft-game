@@ -16,13 +16,13 @@ import com.pdjteam.galagraft.engine.entities.Bullet;
 
 public class Shulker extends EntidadDinamica {
 	
-	private boolean destruida = false;
-    private int vidas = 3;
+	private boolean destruido = false;
+    private int vidas = GameConfig.VIDAS_INICIALES;
     private float xVel = 0;
     private final float VELOCIDAD_NAVE = 8f; // velocidad fija manejable
     
     private Sprite spr;
-    private Sound sonidoHerido;
+    private Sound soundHerido;
     private Sound soundBala;
     private Sound soundBalaJ;
     private Texture txBala;
@@ -32,7 +32,7 @@ public class Shulker extends EntidadDinamica {
     private int tiempoHerido;
     
     public Shulker(int x, int y, Texture tx, Sound soundChoque, Texture txBala, Sound soundBala, Sound soundBalaJ) {
-    	this.sonidoHerido = soundChoque;
+    	this.soundHerido = soundChoque;
     	this.soundBala = soundBala;
     	this.soundBalaJ = soundBalaJ;
     	this.txBala = txBala;
@@ -100,19 +100,19 @@ public class Shulker extends EntidadDinamica {
             vidas--;
             herido = true;
   		    tiempoHerido = tiempoHeridoMax;
-  		    sonidoHerido.play();
+  		    soundHerido.play();
   		    
-            if (vidas <= 0) destruida = true;
+            if (vidas <= 0) destruido = true;
             return true;
         }
         return false;
     }
     
-    public boolean estaDestruido() { return !herido && destruida; }
+    public boolean estaDestruido() { return !herido && destruido; }
     public boolean estaHerido() { return herido; }
     public int getVidas() { return vidas; }
     public int getX() { return (int) spr.getX(); }
     public int getY() { return (int) spr.getY(); }
-	public void setVidas(int vidas2) { vidas = vidas2; }
+	public void setVidas(int vidas) { this.vidas = vidas; }
 	
 }
