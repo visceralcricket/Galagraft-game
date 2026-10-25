@@ -4,7 +4,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+
 import com.pdjteam.galagraft.config.GameConfig;
+
 import com.pdjteam.galagraft.interfaces.Colisionable;
 
 public class Proyectil implements Colisionable {
@@ -31,19 +33,19 @@ public class Proyectil implements Colisionable {
     }
 
     public void actualizar(float delta) {
-        if (!this.activa) return;
+        if(!this.activa) return;
         this.x += this.velocidadX * delta;
         this.y += this.velocidadY * delta;
         this.sprite.setPosition(this.x, this.y);
 
-        if (this.y > GameConfig.ALTO_MUNDO || this.y < -this.sprite.getHeight() ||
+        if(this.y > GameConfig.ALTO_MUNDO || this.y < -this.sprite.getHeight() ||
             this.x < -this.sprite.getWidth() || this.x > GameConfig.ANCHO_MUNDO) {
             this.activa = false;
         }
     }
 
     public void dibujar(SpriteBatch batch) {
-        if (this.activa && this.sprite != null && this.sprite.getTexture() != null) {
+        if(this.activa && this.sprite != null && this.sprite.getTexture() != null) {
             this.sprite.draw(batch);
         }
     }
@@ -55,7 +57,7 @@ public class Proyectil implements Colisionable {
 
     @Override
     public boolean verificarColision(Colisionable otro) {
-        if (!this.activa || !otro.estaActiva()) return false;
+        if(!this.activa || !otro.estaActiva()) return false;
         return this.getAreaColision().overlaps(otro.getAreaColision());
     }
 

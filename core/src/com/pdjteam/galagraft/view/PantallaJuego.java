@@ -14,7 +14,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+
 import com.pdjteam.galagraft.Galagraft;
+
 import com.pdjteam.galagraft.engine.entities.*;
 import com.pdjteam.galagraft.strategies.DisparoTriplePowerUpStrategy;
 import com.pdjteam.galagraft.config.*;
@@ -68,10 +70,11 @@ public class PantallaJuego implements Screen {
 		sndDisparoJ = Gdx.audio.newSound(Gdx.files.internal(GameConfig.SND_DISPARO_J));
 		
 		Shulker jugador = Shulker.inicializarInstancia(
-				GameConfig.ANCHO_MUNDO / 2f - 40f, 
+				GameConfig.ANCHO_MUNDO / 2f - 32f, 
 				60f, 
 				texShulker, 
 				texBala, 
+				sndDisparo,
 				sndDisparoJ, 
 				sndDano, 
 				proyectiles
@@ -94,22 +97,18 @@ public class PantallaJuego implements Screen {
 	
 	@Override
 	public void render(float delta) {
-		// cierre seguro sin crashear OpenGL
-		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
-			gameMusic.stop();
+		if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
 			Gdx.app.exit();
 			return;
 		}
 
-		// Pausa con tecla P
-		if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+		if(Gdx.input.isKeyJustPressed(Input.Keys.P)) {
 			pausado = !pausado;
-			if (pausado) gameMusic.pause();
+			if(pausado) gameMusic.pause();
 			else gameMusic.play();
 		}
 
-		// Power-Up (Strategy GM-7) con tecla E
-		if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+		if(Gdx.input.isKeyJustPressed(Input.Keys.E)) {
 			logica.getJugador().aplicarPowerUp(new DisparoTriplePowerUpStrategy(), 10f);
 		}
 
@@ -118,9 +117,9 @@ public class PantallaJuego implements Screen {
 		camera.update();
 		batch.setProjectionMatrix(camera.combined);
 		
-		if (!pausado) {
+		if(!pausado) {
 			logica.getJugador().actualizar(delta);
-			if (logica.actualizar(delta) > 0) {
+			if(logica.actualizar(delta) > 0) {
 				explosionSound.play(GameConfig.VOLUMEN_EXPLOSION);
 			}
 		}
@@ -131,37 +130,38 @@ public class PantallaJuego implements Screen {
 		batch.setColor(1f, 1f, 1f, 1f); 
 		dibujaEncabezado();
 
-		// dibujar proyectiles solo una vez
-		for (Proyectil b : logica.getBalas()) {
+		for(Proyectil b : logica.getBalas()) {
 			b.dibujar(batch);
 		}
 
 		logica.getJugador().dibujar(batch);
 
 		ArrayList<Enemigo> enemigos = logica.getEnemigos();
-		for (int i = 0; i < enemigos.size(); i++) {
+		for(int i = 0; i < enemigos.size(); i++) {
 			Enemigo e = enemigos.get(i);
 			e.dibujar(batch);
-			if (!pausado && logica.getJugador().verificarColision(e)) {
+			if(!pausado && logica.getJugador().verificarColision(e)) {
 				logica.getJugador().alColisionar(e);
 				logica.eliminarEnemigo(i);
 				i--;
 			}   	  
 		}
 
-		if (pausado) {
+		if(pausado) {
 			game.getFont().draw(batch, "JUEGO EN PAUSA - [P] Continuar | [ESC] Salir", 0, GameConfig.ALTO_MUNDO / 2f, GameConfig.ANCHO_MUNDO, Align.center, false);
 		}
 		batch.end();
 	    
-		if (!pausado && logica.juegoTerminado()) {
-			if (logica.getPuntuacion() > game.getHighScore())
+		if(!pausado && logica.juegoTerminado()) {
+			if(logica.getPuntuacion() > game.getHighScore())
 				game.setHighScore(logica.getPuntuacion());
-			game.setScreen(new PantallaGameOver(game, logica.getPuntuacion()));
+			Screen ss = new PantallaGameOver(game, logica.getPuntuacion());
+			game.setScreen(ss);
+			dispose();
 			return;
 		}
 
-		if (!pausado && logica.rondaCompletada()) {
+		if(!pausado && logica.rondaCompletada()) {
 			Screen ss = new PantallaJuego(game, logica.getRonda() + 1, logica.getJugador().getVida(),
 					logica.getPuntuacion(),
 					Math.min(GameConfig.VEL_MAX, logica.getVelX() + GameConfig.VEL_POR_RONDA),
@@ -169,6 +169,7 @@ public class PantallaJuego implements Screen {
 					Math.round(logica.getCantEnemigos() * (1 + GameConfig.CRECIMIENTO_ENEMIGOS)),
 					Math.round(logica.getMaxEnPantalla() * (1 + GameConfig.CRECIMIENTO_MAX_PANTALLA)));
 			game.setScreen(ss);
+			dispose();
 		}
 	}
     
@@ -195,17 +196,17 @@ public class PantallaJuego implements Screen {
 	public void resume() {}
 
 	@Override
-	public void hide() { dispose(); }
+	public void hide() {}
 
 	@Override
 	public void dispose() {
-		if (recursosLiberados) return;
+		if(recursosLiberados) return;
 		recursosLiberados = true;
 		explosionSound.dispose();
 		gameMusic.dispose();
 		texShulker.dispose();
 		texBala.dispose();
-		for (Texture t : texEnemigos) t.dispose();
+		for(Texture t : texEnemigos) t.dispose();
 		sndDano.dispose();
 		sndDisparo.dispose();
 		sndDisparoJ.dispose();

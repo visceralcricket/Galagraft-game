@@ -3,6 +3,8 @@ package com.pdjteam.galagraft.engine.entities;
 import java.util.List;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+
+// interfaz
 import com.pdjteam.galagraft.interfaces.Colisionable;
 
 public abstract class Enemigo extends EntidadDinamica {
@@ -28,7 +30,7 @@ public abstract class Enemigo extends EntidadDinamica {
      */
     @Override
     public final void actualizar(float delta) {
-        if (!estaActiva()) return;
+        if(!estaActiva()) return;
 
         // actualizar cooldowns
         actualizarTemporizadores(delta);
@@ -40,9 +42,9 @@ public abstract class Enemigo extends EntidadDinamica {
         verificarLimitesPantalla();
 
         // gancho + operación abstracta de ataque
-        if (puedeAtacar()) {
+        if(puedeAtacar()) {
             Proyectil nuevoDisparo = crearProyectilAtaque();
-            if (nuevoDisparo != null && this.listaProyectilesJuego != null) {
+            if(nuevoDisparo != null && this.listaProyectilesJuego != null) {
                 this.listaProyectilesJuego.add(nuevoDisparo);
             }
             reiniciarTemporizadorDisparo();
@@ -57,15 +59,16 @@ public abstract class Enemigo extends EntidadDinamica {
 
     protected void verificarLimitesPantalla() {
         float anchoSprite = getSprite() != null ? getSprite().getWidth() : 32f;
-        if (getX() <= 0) {
+        if(getX() <= 0) {
             setX(0);
             setVelocidadX(Math.abs(getVelocidadX()));
-        } else if (getX() + anchoSprite >= Gdx.graphics.getWidth()) {
+        }
+        else if(getX() + anchoSprite >= Gdx.graphics.getWidth()) {
             setX(Gdx.graphics.getWidth() - anchoSprite);
             setVelocidadX(-Math.abs(getVelocidadX()));
         }
 
-        if (getY() < -anchoSprite) {
+        if(getY() < -anchoSprite) {
             setActiva(false);
         }
     }
@@ -84,9 +87,9 @@ public abstract class Enemigo extends EntidadDinamica {
 
     @Override
     public void alColisionar(Colisionable otro) {
-        if (otro instanceof Proyectil) {
+        if(otro instanceof Proyectil) {
             Proyectil p = (Proyectil) otro;
-            if (p.isEsDelJugador()) {
+            if(p.isEsDelJugador()) {
                 recibirDano(p.getDano());
             }
         }

@@ -4,7 +4,9 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+
 import com.pdjteam.galagraft.config.GameConfig;
+
 import com.pdjteam.galagraft.interfaces.Colisionable;
 
 public class Bullet implements Colisionable {
@@ -24,10 +26,10 @@ public class Bullet implements Colisionable {
 
     public void update() {
         spr.setPosition(spr.getX() + xSpeed, spr.getY() + ySpeed);
-        if (spr.getX() < 0 || spr.getX() + spr.getWidth() > GameConfig.ANCHO_MUNDO) {
+        if(spr.getX() < 0 || spr.getX() + spr.getWidth() > GameConfig.ANCHO_MUNDO) {
             destroyed = true;
         }
-        if (spr.getY() < 0 || spr.getY() + spr.getHeight() > GameConfig.ALTO_MUNDO) {
+        if(spr.getY() < 0 || spr.getY() + spr.getHeight() > GameConfig.ALTO_MUNDO) {
             destroyed = true;
         }
     }
@@ -37,7 +39,7 @@ public class Bullet implements Colisionable {
     }
 
     public boolean checkCollision(Enemigo b2) {
-        if (spr.getBoundingRectangle().overlaps(b2.getAreaColision())) {
+        if(spr.getBoundingRectangle().overlaps(b2.getAreaColision())) {
             this.destroyed = true;
             return true;
         }
@@ -51,7 +53,7 @@ public class Bullet implements Colisionable {
 
     @Override
     public boolean verificarColision(Colisionable otro) {
-        if (this.destroyed || !otro.estaActiva()) return false;
+        if(this.destroyed || !otro.estaActiva()) return false;
         return this.getAreaColision().overlaps(otro.getAreaColision());
     }
 

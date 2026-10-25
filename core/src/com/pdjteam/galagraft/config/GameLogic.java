@@ -9,6 +9,8 @@ import java.util.TreeMap;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
+
+// entidades
 import com.pdjteam.galagraft.engine.entities.Enemigo;
 import com.pdjteam.galagraft.engine.entities.EnemigoBlaze;
 import com.pdjteam.galagraft.engine.entities.EnemigoEsqueleto;
@@ -66,7 +68,7 @@ public class GameLogic {
 
         int mayorLado = 0;
 
-        for (int lado : GameConfig.ENEMIGO_LADOS) {
+        for(int lado : GameConfig.ENEMIGO_LADOS) {
             mayorLado = Math.max(mayorLado, lado);
         }
 
@@ -77,15 +79,15 @@ public class GameLogic {
 
     private void generarLineas(float delta) {
 
-        if (pendientes <= 0) return;
+        if(pendientes <= 0) return;
 
         msDesdeLinea += delta * 1000;
 
-        if (!mobs1.isEmpty() && msDesdeLinea < GameConfig.INTERVALO_LINEA_MS) return;
+        if(!mobs1.isEmpty() && msDesdeLinea < GameConfig.INTERVALO_LINEA_MS) return;
 
         int cantidad = Math.min(pendientes, Math.min(GameConfig.ENEMIGOS_POR_FILA, maxEnPantalla));
 
-        if (mobs1.size() + cantidad > maxEnPantalla) return;
+        if(mobs1.size() + cantidad > maxEnPantalla) return;
 
         crearLinea(cantidad);
         pendientes -= cantidad;
@@ -96,23 +98,23 @@ public class GameLogic {
 
         int yAparicion = GameConfig.ALTO_MUNDO - GameConfig.FORMACION_MARGEN - celda;
 
-        if (!mobs1.isEmpty()) {
+        if(!mobs1.isEmpty()) {
             float techo = 0;
 
-            for (Enemigo e : mobs1) {
+            for(Enemigo e : mobs1) {
                 Rectangle area = e.getAreaColision();
                 techo = Math.max(techo, area.y + area.height);
             }
 
             int empuje = (int) Math.ceil(techo - (yAparicion - GameConfig.ENEMIGO_DISTANCIA_MIN / 2));
             
-            if (empuje > 0) desplazar(0, -empuje);
+            if(empuje > 0) desplazar(0, -empuje);
         }
 
         int fila = siguienteFila++;
         direccionFila.put(fila, 1);
 
-        for (int c = 0; c < cantidad; c++) {
+        for(int c = 0; c < cantidad; c++) {
             int tipo = azar.nextInt(texEnemigos.length);
             int lado = GameConfig.ENEMIGO_LADOS[tipo];
             
@@ -122,14 +124,14 @@ public class GameLogic {
             
             int y = yAparicion + (celda - lado) / 2;
             Enemigo e;
-            if (azar.nextBoolean()) {
+            if(azar.nextBoolean()) {
                 e = new EnemigoEsqueleto(x, y, texEnemigos[tipo], jugador.getTexturaBala(), balas);
             }
             else {
                 e = new EnemigoBlaze(x, y, texEnemigos[tipo], jugador.getTexturaBala(), balas);
             }
             
-            if (e.getSprite() != null) e.getSprite().setSize(lado, lado);
+            if(e.getSprite() != null) e.getSprite().setSize(lado, lado);
 
             e.setFila(fila);
             mobs1.add(e);
@@ -141,17 +143,17 @@ public class GameLogic {
         Map<Integer, ArrayList<Enemigo>> filas =
                 new TreeMap<>();
 
-        for (Enemigo e : mobs1) {
+        for(Enemigo e : mobs1) {
             ArrayList<Enemigo> grupo =
                     filas.get(e.getFila());
-            if (grupo == null) {
+            if(grupo == null) {
                 grupo = new ArrayList<>();
                 filas.put(e.getFila(), grupo);
             }
             grupo.add(e);
         }
         direccionFila.keySet().retainAll(filas.keySet());
-        for (Map.Entry<Integer, ArrayList<Enemigo>> par: filas.entrySet()) {
+        for(Map.Entry<Integer, ArrayList<Enemigo>> par: filas.entrySet()) {
             moverFila(par.getKey(), par.getValue());
         }
     }
@@ -161,7 +163,7 @@ public class GameLogic {
         float izq = Float.MAX_VALUE;
         float der = -Float.MAX_VALUE;
 
-        for (Enemigo e : enemigos) {
+        for(Enemigo e : enemigos) {
             Rectangle area = e.getAreaColision();
             izq = Math.min(izq, area.x);
             der = Math.max(der, area.x + area.width);
@@ -174,14 +176,14 @@ public class GameLogic {
         int dx = direccion * velX;
 
         boolean tocaBorde = false;
-        if (dx > 0 && der + dx >= limiteDer) {
+        if(dx > 0 && der + dx >= limiteDer) {
             dx = Math.max( 0, (int) (limiteDer - der));
 
             direccion = -1;
             tocaBorde = true;
         }
         
-        else if (dx < 0 && izq + dx <= limiteIzq) {
+        else if(dx < 0 && izq + dx <= limiteIzq) {
             dx = Math.min( 0, (int) (limiteIzq - izq));
             direccion = 1;
             tocaBorde = true;
@@ -189,10 +191,10 @@ public class GameLogic {
         
         direccionFila.put(fila, direccion);
         int dy = 0;
-        if (tocaBorde && puedeBajar( fila, enemigos, GameConfig.ENEMIGO_ESCALON)) {
+        if(tocaBorde && puedeBajar( fila, enemigos, GameConfig.ENEMIGO_ESCALON)) {
             dy = -GameConfig.ENEMIGO_ESCALON;
         }
-        for (Enemigo e : enemigos) {
+        for(Enemigo e : enemigos) {
             e.mover(dx, dy);
         }
     }
@@ -200,16 +202,16 @@ public class GameLogic {
     private boolean puedeBajar( int fila, ArrayList<Enemigo> enemigos, int paso) {
         int holgura = GameConfig.ENEMIGO_DISTANCIA_MIN / 2;
 
-        for (Enemigo e : enemigos) {
+        for(Enemigo e : enemigos) {
 
             Rectangle a = e.getAreaColision();
             float desde = a.y - paso - holgura;
             float hasta = a.y - paso + a.height + holgura;
 
-            for (Enemigo otro : mobs1) {
+            for(Enemigo otro : mobs1) {
                 Rectangle o = otro.getAreaColision();
                 
-                if (otro.getFila() != fila
+                if(otro.getFila() != fila
                         && desde < o.y + o.height
                         && hasta > o.y) {
                     return false;
@@ -220,14 +222,14 @@ public class GameLogic {
     }
 
     private void desplazar(int dx, int dy) {
-        for (Enemigo e : mobs1) {
+        for(Enemigo e : mobs1) {
             e.mover(dx, dy);
         }
     }
 
     private void eliminarEscapados() {
-        for (int i = mobs1.size() - 1; i >= 0; i--) {
-            if (mobs1.get(i).getAreaColision().y <= 0) {
+        for(int i = mobs1.size() - 1; i >= 0; i--) {
+            if(mobs1.get(i).getAreaColision().y <= 0) {
                 mobs1.remove(i);
                 pendientes += GameConfig.ENEMIGOS_POR_ESCAPE;
             }
@@ -236,25 +238,25 @@ public class GameLogic {
 
     public int actualizar(float delta) {
         int destruidos = 0;
-        if (!jugador.estaActiva()) {
+        if(!jugador.estaActiva()) {
             return 0;
         }
         // updatear proyectiles y comprobar sus colisiones
-        for (int i = balas.size() - 1; i >= 0; i--) {
+        for(int i = balas.size() - 1; i >= 0; i--) {
 
             Proyectil p = balas.get(i);
             p.actualizar(delta);
-            if (!p.estaActiva()) {
+            if(!p.estaActiva()) {
                 balas.remove(i);
                 continue;
             }
-            if (!p.isEsDelJugador()) {
+            if(!p.isEsDelJugador()) {
                 continue;
             }
-            for (int j = mobs1.size() - 1; j >= 0; j--) {
+            for(int j = mobs1.size() - 1; j >= 0; j--) {
 
                 Enemigo enemigo = mobs1.get(j);
-                if (p.verificarColision(enemigo)) {
+                if(p.verificarColision(enemigo)) {
                 	
                 	
                     p.setActiva(false);

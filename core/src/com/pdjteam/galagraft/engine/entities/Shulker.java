@@ -6,48 +6,59 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.MathUtils;
+
 import com.pdjteam.galagraft.config.GameConfig;
+
+// strategies
 import com.pdjteam.galagraft.strategies.DisparoSimpleStrategy;
 import com.pdjteam.galagraft.strategies.EstrategiaDisparo;
+
+// Interfaz
 import com.pdjteam.galagraft.interfaces.Colisionable;
 
 public class Shulker extends EntidadDinamica {
+    // GM-6 Singleton
     private static Shulker instancia;
-    private static final float TAMANO_SHULKER = 80f;
+    private static final float TAMANO_SHULKER = 64f;
 
+    // atributos encapsulados: GM-5
     private int puntaje;
     private float tiempoDesdeUltimoDisparo;
     private float tiempoPowerUpRestante;
-    private EstrategiaDisparo estrategiaDisparo;
+    private EstrategiaDisparo estrategiaDisparo; // referencia a Strategy (GM-7)
     private Texture texturaBala;
     private Sound sonidoDisparo;
+    private Sound sonidoDisparoJ;
     private Sound sonidoHurt;
     private List<Proyectil> proyectilesJuego;
 
     private Shulker(float x, float y, Texture texturaJugador, Texture texturaBala, 
-                    Sound sonidoDisparo, Sound sonidoHurt, List<Proyectil> proyectiles) {
-        super(x, y, 600f, 0f, GameConfig.VIDAS_INICIALES, texturaJugador);
+                    Sound sonidoDisparo, Sound sonidoDisparoJ, Sound sonidoHurt, List<Proyectil> proyectiles) {
+        super(x, y, 500f, 0f, GameConfig.VIDAS_INICIALES, texturaJugador);
         this.puntaje = 0;
         this.tiempoDesdeUltimoDisparo = 0f;
         this.tiempoPowerUpRestante = 0f;
         this.estrategiaDisparo = new DisparoSimpleStrategy();
         this.texturaBala = texturaBala;
         this.sonidoDisparo = sonidoDisparo;
+        this.sonidoDisparoJ = sonidoDisparoJ;
         this.sonidoHurt = sonidoHurt;
         this.proyectilesJuego = proyectiles;
 
-        if (getSprite() != null) {
+        if(getSprite() != null) {
             getSprite().setSize(TAMANO_SHULKER, TAMANO_SHULKER);
             getSprite().setPosition(x, y);
         }
     }
 
     public static Shulker inicializarInstancia(float x, float y, Texture texJugador, Texture texBala,
-                                               Sound sDisparo, Sound sHurt, List<Proyectil> proyectiles) {
-        if (instancia == null) {
-            instancia = new Shulker(x, y, texJugador, texBala, sDisparo, sHurt, proyectiles);
-        } else {
-            instancia.reiniciarEstado(x, y, texJugador, texBala, sDisparo, sHurt, proyectiles);
+                                               Sound sDisparo, Sound sDisparoJ, Sound sHurt, List<Proyectil> proyectiles) {
+        if(instancia == null) {
+            instancia = new Shulker(x, y, texJugador, texBala, sDisparo, sDisparoJ, sHurt, proyectiles);
+        }
+        else {
+            instancia.reiniciarEstado(x, y, texJugador, texBala, sDisparo, sDisparoJ, sHurt, proyectiles);
         }
         return instancia;
     }
@@ -56,18 +67,18 @@ public class Shulker extends EntidadDinamica {
         return instancia;
     }
 
-    // actualizar las nuevas texturas y sonidos al reiniciar
     public void reiniciarEstado(float x, float y, Texture texJugador, Texture texBala,
-                                Sound sDisparo, Sound sHurt, List<Proyectil> proyectiles) {
+                                Sound sDisparo, Sound sDisparoJ, Sound sHurt, List<Proyectil> proyectiles) {
         this.texturaBala = texBala;
         this.sonidoDisparo = sDisparo;
+        this.sonidoDisparoJ = sDisparoJ;
         this.sonidoHurt = sHurt;
         this.proyectilesJuego = proyectiles;
         this.tiempoDesdeUltimoDisparo = 0f;
         this.tiempoPowerUpRestante = 0f;
         this.estrategiaDisparo = new DisparoSimpleStrategy();
 
-        if (texJugador != null) {
+        if(texJugador != null) {
             Sprite nuevoSprite = new Sprite(texJugador);
             nuevoSprite.setSize(TAMANO_SHULKER, TAMANO_SHULKER);
             nuevoSprite.setPosition(x, y);
@@ -85,37 +96,44 @@ public class Shulker extends EntidadDinamica {
 
     @Override
     public void actualizar(float delta) {
-        if (!estaActiva()) return;
+        if(!estaActiva()) return;
 
         this.tiempoDesdeUltimoDisparo += delta;
 
-        if (this.tiempoPowerUpRestante > 0) {
+        if(this.tiempoPowerUpRestante > 0) {
             this.tiempoPowerUpRestante -= delta;
-            if (this.tiempoPowerUpRestante <= 0) {
+            if(this.tiempoPowerUpRestante <= 0) {
                 this.estrategiaDisparo = new DisparoSimpleStrategy();
             }
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
+        if(Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
             setX(getX() - getVelocidadX() * delta);
         }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
+        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
             setX(getX() + getVelocidadX() * delta);
         }
 
-        // SOLUCIÓN LÍMITES: Usar GameConfig.ANCHO_MUNDO (1800) en vez de Gdx.graphics.getWidth()
         float ancho = getSprite() != null ? getSprite().getWidth() : TAMANO_SHULKER;
-        if (getX() < 0) setX(0);
-        if (getX() + ancho > GameConfig.ANCHO_MUNDO) {
+        
+        if(getX() < 0) setX(0);
+        if(getX() + ancho > GameConfig.ANCHO_MUNDO) {
             setX(GameConfig.ANCHO_MUNDO - ancho);
         }
 
-        if (Gdx.input.isKeyPressed(Input.Keys.SPACE) && 
-            this.tiempoDesdeUltimoDisparo >= this.estrategiaDisparo.getTiempoEnfriamiento()) {
+        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && 
+            this.tiempoDesdeUltimoDisparo >= this.estrategiaDisparo.getTiempoEnfriamiento() &&
+            this.proyectilesJuego.size() < GameConfig.MAX_BALAS) {
+
             this.estrategiaDisparo.ejecutarDisparo(this, this.proyectilesJuego, this.texturaBala);
-            if (this.sonidoDisparo != null) {
-                this.sonidoDisparo.play(0.5f);
+
+            if(MathUtils.random() < GameConfig.PROB_DISPARO_J) {
+                if(this.sonidoDisparoJ != null) this.sonidoDisparoJ.play();
             }
+            else {
+                if(this.sonidoDisparo != null) this.sonidoDisparo.play();
+            }
+
             this.tiempoDesdeUltimoDisparo = 0f;
         }
 
@@ -124,15 +142,16 @@ public class Shulker extends EntidadDinamica {
 
     @Override
     public void alColisionar(Colisionable otro) {
-        if (otro instanceof Proyectil) {
+        if(otro instanceof Proyectil) {
             Proyectil p = (Proyectil) otro;
-            if (!p.isEsDelJugador()) {
+            if(!p.isEsDelJugador()) {
                 recibirDano(p.getDano());
-                if (this.sonidoHurt != null) this.sonidoHurt.play();
+                if(this.sonidoHurt != null) this.sonidoHurt.play();
             }
-        } else if (otro instanceof Enemigo) {
+        }
+        else if(otro instanceof Enemigo) {
             recibirDano(1);
-            if (this.sonidoHurt != null) this.sonidoHurt.play();
+            if(this.sonidoHurt != null) this.sonidoHurt.play();
         }
     }
 
@@ -154,6 +173,9 @@ public class Shulker extends EntidadDinamica {
     
     public Sound getSonidoDisparo() { return sonidoDisparo; }
     public void setSonidoDisparo(Sound sonidoDisparo) { this.sonidoDisparo = sonidoDisparo; }
+    
+    public Sound getSonidoDisparoJ() { return sonidoDisparoJ; }
+    public void setSonidoDisparoJ(Sound sonidoDisparoJ) { this.sonidoDisparoJ = sonidoDisparoJ; }
     
     public Sound getSonidoHurt() { return sonidoHurt; }
     public void setSonidoHurt(Sound sonidoHurt) { this.sonidoHurt = sonidoHurt; }

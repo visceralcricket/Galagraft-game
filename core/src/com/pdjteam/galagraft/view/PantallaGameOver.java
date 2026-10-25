@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.graphics.Texture;
+
 import com.pdjteam.galagraft.Galagraft;
 import com.pdjteam.galagraft.config.*;
 
@@ -20,6 +21,7 @@ public class PantallaGameOver implements Screen {
 	private Texture fondo;
 	private Texture fondoTitulo;
 	private Texture fondoTexto;
+	private boolean recursosLiberados = false;
 	private int puntuacion;
 
 	public PantallaGameOver(Galagraft game, int puntuacion) {
@@ -98,41 +100,32 @@ public class PantallaGameOver implements Screen {
 	
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void resize(int width, int height) {
 		viewport.update(width, height, true);
-		
 	}
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void resume() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void dispose() {
-		fondo.dispose();
-		fondoTitulo.dispose();
-		fondoTexto.dispose();
-		// TODO Auto-generated method stub
-		
+	    if (recursosLiberados) return;
+	    recursosLiberados = true;
+	    fondo.dispose();
+	    fondoTitulo.dispose();
+	    fondoTexto.dispose();
 	}
    
 }

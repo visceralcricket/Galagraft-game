@@ -1,6 +1,7 @@
 package com.pdjteam.galagraft.engine.entities;
 
 import java.util.List;
+
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 
@@ -24,7 +25,7 @@ public class EnemigoBlaze extends Enemigo {
     protected Proyectil crearProyectilAtaque() {
         float centroX = getX() + (getSprite().getWidth() / 2f);
         float direccionX = 0f;
-        if (Shulker.getInstancia() != null) {
+        if(Shulker.getInstancia() != null) {
             float diffX = Shulker.getInstancia().getX() - centroX;
             direccionX = MathUtils.clamp(diffX, -120f, 120f);
         }

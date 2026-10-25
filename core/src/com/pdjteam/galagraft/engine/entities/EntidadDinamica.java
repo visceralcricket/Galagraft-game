@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
+
+// Interfaz
 import com.pdjteam.galagraft.interfaces.Colisionable;
 
 public abstract class EntidadDinamica implements Colisionable {

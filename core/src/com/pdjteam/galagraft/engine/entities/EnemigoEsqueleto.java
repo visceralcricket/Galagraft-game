@@ -1,6 +1,7 @@
 package com.pdjteam.galagraft.engine.entities;
 
 import java.util.List;
+
 import com.badlogic.gdx.graphics.Texture;
 
 public class EnemigoEsqueleto extends Enemigo {
@@ -17,7 +18,7 @@ public class EnemigoEsqueleto extends Enemigo {
 
     @Override
     protected Proyectil crearProyectilAtaque() {
-        // dispara una flecha hacia abajo (recto)
+        // dispara una flecha hacia abajo en linea recta
         float centroX = getX() + (getSprite().getWidth() / 2f) - 4f;
         return new Proyectil(centroX, getY(), 0f, -280f, 1, false, getTexturaProyectil());
     }
