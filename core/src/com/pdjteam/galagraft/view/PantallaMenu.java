@@ -26,6 +26,12 @@ public class PantallaMenu implements Screen {
 
 	@Override
 	public void render(float delta) {
+		
+		if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+			Gdx.app.exit();
+			return;
+		}
+		
 		ScreenUtils.clear(0, 0, 0.2f, 1);
 		viewport.apply();
 		camera.update();
@@ -36,8 +42,8 @@ public class PantallaMenu implements Screen {
 		game.getFont().draw(game.getBatch(), "Presiona en cualquier lado o presiona cualquier tecla para comenzar ...", 0, GameConfig.ALTO_MUNDO / 2 - 100, GameConfig.ANCHO_MUNDO, Align.center, false);
 	
 		game.getBatch().end();
-
-		if (Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY)) {
+		
+		if(Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(Input.Keys.ENTER) || Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
 			Screen ss = new PantallaJuego(game, 1, GameConfig.VIDAS_INICIALES, 0, GameConfig.VEL_INICIAL, GameConfig.VEL_INICIAL, GameConfig.ENEMIGOS_INICIAL, GameConfig.ENEMIGOS_MAX_PANTALLA_INICIAL);
 			game.setScreen(ss);
 			dispose();
@@ -46,39 +52,23 @@ public class PantallaMenu implements Screen {
 	
 	
 	@Override
-	public void show() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void show() { }
 
 	@Override
 	public void resize(int width, int height) {
 		viewport.update(width, height, true);
-		
 	}
 
 	@Override
-	public void pause() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void pause() { }
 
 	@Override
-	public void resume() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void resume() { }
 
 	@Override
-	public void hide() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void hide() { }
 
 	@Override
-	public void dispose() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void dispose() { }
    
 }

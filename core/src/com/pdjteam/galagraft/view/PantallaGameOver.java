@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.graphics.Texture;
+
 import com.pdjteam.galagraft.Galagraft;
 import com.pdjteam.galagraft.config.*;
 
@@ -20,6 +21,7 @@ public class PantallaGameOver implements Screen {
 	private Texture fondo;
 	private Texture fondoTitulo;
 	private Texture fondoTexto;
+	private boolean recursosLiberados = false;
 	private int puntuacion;
 
 	public PantallaGameOver(Galagraft game, int puntuacion) {
@@ -45,10 +47,9 @@ public class PantallaGameOver implements Screen {
 		
 		game.getBatch().begin();
 		
-		// Fondo Game Over
+		// fondo Game Over
 		game.getBatch().draw(fondo, 0, 0, GameConfig.ANCHO_MUNDO, GameConfig.ALTO_MUNDO);
 		
-		// Tamaños y posiciones de los textos
 		float anchoTit = GameConfig.ANCHO_MUNDO * 0.5f;
 		float altoTit = anchoTit * fondoTitulo.getHeight() / fondoTitulo.getWidth();
 		
@@ -62,7 +63,7 @@ public class PantallaGameOver implements Screen {
 		float yTit = yTxt + altoTxt + separacion;
 		float yPuntaje = yTxt - 50;
 		
-		// Textos del fondo
+		// texto
 		game.getBatch().draw(fondoTitulo, (GameConfig.ANCHO_MUNDO - anchoTit) / 2, yTit, anchoTit, altoTit);
 		game.getBatch().draw(fondoTexto, (GameConfig.ANCHO_MUNDO - anchoTxt) / 2, yTxt, anchoTxt, altoTxt);
 		game.getFont().getData().setScale(1.5f);
@@ -72,7 +73,24 @@ public class PantallaGameOver implements Screen {
 		
 		game.getBatch().end();
 
+		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+		    Gdx.app.exit();
+		    return;
+		}
+		
 		if (Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(Input.Keys.ANY_KEY)) {
+			Screen ss = new PantallaJuego(game, 1, GameConfig.VIDAS_INICIALES, 0, GameConfig.VEL_INICIAL, GameConfig.VEL_INICIAL, GameConfig.ENEMIGOS_INICIAL, GameConfig.ENEMIGOS_MAX_PANTALLA_INICIAL);
+			game.setScreen(ss);
+			dispose();
+		}
+		
+		// Asegurarse de cerrar correctamente el juego
+		if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+			Gdx.app.exit();
+			return;
+		}
+		
+		if (Gdx.input.isTouched() || Gdx.input.isKeyJustPressed(Input.Keys.ENTER) || Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
 			Screen ss = new PantallaJuego(game, 1, GameConfig.VIDAS_INICIALES, 0, GameConfig.VEL_INICIAL, GameConfig.VEL_INICIAL, GameConfig.ENEMIGOS_INICIAL, GameConfig.ENEMIGOS_MAX_PANTALLA_INICIAL);
 			game.setScreen(ss);
 			dispose();
@@ -82,41 +100,32 @@ public class PantallaGameOver implements Screen {
 	
 	@Override
 	public void show() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void resize(int width, int height) {
 		viewport.update(width, height, true);
-		
 	}
 
 	@Override
 	public void pause() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void resume() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void dispose() {
-		fondo.dispose();
-		fondoTitulo.dispose();
-		fondoTexto.dispose();
-		// TODO Auto-generated method stub
-		
+	    if (recursosLiberados) return;
+	    recursosLiberados = true;
+	    fondo.dispose();
+	    fondoTitulo.dispose();
+	    fondoTexto.dispose();
 	}
    
 }
