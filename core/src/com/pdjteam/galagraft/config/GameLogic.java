@@ -14,16 +14,20 @@ import com.badlogic.gdx.math.Rectangle;
 import com.pdjteam.galagraft.engine.entities.Enemigo;
 import com.pdjteam.galagraft.engine.entities.EnemigoBlaze;
 import com.pdjteam.galagraft.engine.entities.EnemigoEsqueleto;
+import com.pdjteam.galagraft.engine.entities.Potenciador;
 import com.pdjteam.galagraft.engine.entities.Proyectil;
 import com.pdjteam.galagraft.engine.entities.Shulker;
+import com.pdjteam.galagraft.engine.powerups.CatalogoPotenciadores;
 
 public class GameLogic {
 
     private final Shulker jugador;
     private final ArrayList<Enemigo> mobs1 = new ArrayList<>();
     private final List<Proyectil> balas;
+    private final List<Potenciador> potenciadores = new ArrayList<>();
 
     private final Texture[] texEnemigos;
+    private final CatalogoPotenciadores catalogoPotenciadores;
     private final Random azar = new Random();
 
     private int puntuacion;
@@ -50,7 +54,8 @@ public class GameLogic {
             int velY,
             int cantEnemigos,
             int maxEnPantalla,
-            Texture[] texEnemigos) {
+            Texture[] texEnemigos,
+            CatalogoPotenciadores catalogoPotenciadores) {
 
         this.jugador = jugador;
         this.ronda = ronda;
@@ -60,6 +65,7 @@ public class GameLogic {
         this.cantEnemigos = cantEnemigos;
         this.maxEnPantalla = maxEnPantalla;
         this.texEnemigos = texEnemigos;
+        this.catalogoPotenciadores = catalogoPotenciadores;
 
         // Shulker administra la lista de proyectiles del juego.
         this.balas = jugador.getProyectilesJuego();
@@ -236,6 +242,32 @@ public class GameLogic {
         }
     }
 
+    // Con cierta probabilidad, el enemigo destruido suelta un potenciador centrado donde murió
+    private void soltarPotenciador(Enemigo muerto) {
+        if(azar.nextFloat() >= GameConfig.PROB_DROP_POTENCIADOR) return;
+
+        Rectangle area = muerto.getAreaColision();
+        float lado = GameConfig.POTENCIADOR_TAMANO;
+        float x = area.x + (area.width - lado) / 2f;
+        float y = area.y + (area.height - lado) / 2f;
+
+        potenciadores.add(catalogoPotenciadores.crearAleatorio(x, y));
+    }
+
+    // Los potenciadores caen, se recogen al tocar al Shulker y se retiran al quedar inactivos
+    private void actualizarPotenciadores(float delta) {
+        for(int i = potenciadores.size() - 1; i >= 0; i--) {
+            Potenciador pw = potenciadores.get(i);
+            pw.actualizar(delta);
+            if(pw.verificarColision(jugador)) {
+                pw.alColisionar(jugador);
+            }
+            if(!pw.estaActiva()) {
+                potenciadores.remove(i);
+            }
+        }
+    }
+
     public int actualizar(float delta) {
         int destruidos = 0;
         if(!jugador.estaActiva()) {
@@ -262,6 +294,7 @@ public class GameLogic {
                     p.setActiva(false);
                     balas.remove(i);
                     mobs1.remove(j);
+                    soltarPotenciador(enemigo);
                     puntuacion += GameConfig.PUNTOS_POR_ENEMIGO;
                     jugador.agregarPuntaje(
                             GameConfig.PUNTOS_POR_ENEMIGO
@@ -271,6 +304,7 @@ public class GameLogic {
                 }
             }
         }
+        actualizarPotenciadores(delta);
         generarLineas(delta);
         moverFormacion();
         eliminarEscapados();
@@ -278,7 +312,7 @@ public class GameLogic {
     }
 
     public boolean puedeDisparar() {
-        return balas.size() < GameConfig.MAX_BALAS;
+        return jugador.hayCupoDeBalas();
     }
 
     public boolean agregarBala(Proyectil p) {
@@ -302,4 +336,5 @@ public class GameLogic {
     public Shulker getJugador() { return jugador; }
     public ArrayList<Enemigo> getEnemigos() { return mobs1; }
     public List<Proyectil> getBalas() { return balas; }
+    public List<Potenciador> getPotenciadores() { return potenciadores; }
 }

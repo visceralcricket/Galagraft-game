@@ -12,7 +12,7 @@ public final class GameConfig {
 	public static final int ENEMIGOS_INICIAL = 10;
 	public static final int VEL_INICIAL = 5;
 	public static final int ENEMIGOS_MAX_PANTALLA_INICIAL = 10; // máximo de enemigos simultáneos en pantalla (ronda 1)
-	public static final int MAX_BALAS = 2;
+	public static final int MAX_BALAS = 2; // tope de balas del jugador en pantalla (no cuenta las enemigas; se ignora con un potenciador activo)
 	
 	// Progresión por cada ronda (los porcentajes son respecto de la ronda anterior)
 	public static final float CRECIMIENTO_ENEMIGOS = 0.30f;     // enemigos totales de la ronda
@@ -33,6 +33,12 @@ public final class GameConfig {
 	// Tamaño de los disparos (bala.png mide 745x500, se escala para el juego)
 	public static final int BALA_ANCHO = 30;
 	public static final int BALA_ALTO = 20;
+	
+	// Potenciadores: lado (px) con que se dibujan y velocidad (px/s) a la que caen
+	public static final int POTENCIADOR_TAMANO = 48;
+	public static final float POTENCIADOR_VEL_CAIDA = 150f;
+	public static final float PROB_DROP_POTENCIADOR = 0.15f;  // probabilidad (0 a 1) de que un enemigo destruido suelte un potenciador
+	public static final float DURACION_DISPARO_TRIPLE = 10f;  // segundos que dura el disparo triple
 	
 	// Tamaño de cada tipo de enemigo (lado mayor en px), en el mismo orden que las texturas:
 	// GRANDE (ghast), MEDIANO (esqueleto), PEQUENO (blaze). Los PNG miden 512x512 y se reducen a este lado.
@@ -56,6 +62,7 @@ public final class GameConfig {
 	public static final String SND_MUSICA_JUEGO = "music.mp3";
 	public static final String TEX_SHULKER = "shulker.png";
 	public static final String TEX_BALA = "bala.png";
+	public static final String TEX_POTENCIADOR_TRIPLE = "tripleShot.png";
 	public static final String TEX_ENEMIGO_GRANDE = "Ghast.png";
 	public static final String TEX_ENEMIGO_MEDIANO = "esqueleto.png";
 	public static final String TEX_ENEMIGO_PEQUENO = "Blaze.png";

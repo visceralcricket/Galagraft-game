@@ -18,6 +18,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.pdjteam.galagraft.Galagraft;
 
 import com.pdjteam.galagraft.engine.entities.*;
+import com.pdjteam.galagraft.engine.powerups.CatalogoPotenciadores;
 import com.pdjteam.galagraft.strategies.DisparoTriplePowerUpStrategy;
 import com.pdjteam.galagraft.config.*;
 
@@ -37,6 +38,7 @@ public class PantallaJuego implements Screen {
 	private Music gameMusic;
 	private Texture texShulker;
 	private Texture texBala;
+	private CatalogoPotenciadores catalogoPotenciadores;
 	private Sound sndDano;
 	private Sound sndDisparo;
 	private Sound sndDisparoJ;
@@ -60,6 +62,7 @@ public class PantallaJuego implements Screen {
 		
 		texShulker = new Texture(Gdx.files.internal(GameConfig.TEX_SHULKER));
 		texBala = new Texture(Gdx.files.internal(GameConfig.TEX_BALA));
+		catalogoPotenciadores = new CatalogoPotenciadores();
 		texEnemigos = new Texture[] {
 				new Texture(Gdx.files.internal(GameConfig.TEX_ENEMIGO_GRANDE)),
 				new Texture(Gdx.files.internal(GameConfig.TEX_ENEMIGO_MEDIANO)),
@@ -83,7 +86,7 @@ public class PantallaJuego implements Screen {
 		jugador.setVida(vidas);
 		jugador.setPuntaje(puntuacion);
 
-		logica = new GameLogic(jugador, ronda, puntuacion, velXEnemigos, velYEnemigos, cantEnemigos, maxEnPantalla, texEnemigos);
+		logica = new GameLogic(jugador, ronda, puntuacion, velXEnemigos, velYEnemigos, cantEnemigos, maxEnPantalla, texEnemigos, catalogoPotenciadores);
 	}
     
 	public void dibujaEncabezado() {
@@ -109,7 +112,7 @@ public class PantallaJuego implements Screen {
 		}
 
 		if(Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-			logica.getJugador().aplicarPowerUp(new DisparoTriplePowerUpStrategy(), 10f);
+			logica.getJugador().activarPotenciador(new DisparoTriplePowerUpStrategy());
 		}
 
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -132,6 +135,10 @@ public class PantallaJuego implements Screen {
 
 		for(Proyectil b : logica.getBalas()) {
 			b.dibujar(batch);
+		}
+
+		for(Potenciador pw : logica.getPotenciadores()) {
+			pw.dibujar(batch);
 		}
 
 		logica.getJugador().dibujar(batch);
@@ -206,6 +213,7 @@ public class PantallaJuego implements Screen {
 		gameMusic.dispose();
 		texShulker.dispose();
 		texBala.dispose();
+		catalogoPotenciadores.dispose();
 		for(Texture t : texEnemigos) t.dispose();
 		sndDano.dispose();
 		sndDisparo.dispose();
