@@ -1,111 +1,242 @@
 package com.pdjteam.galagraft.engine.entities;
 
+import java.util.ArrayList;
+import java.util.List;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 
-import com.pdjteam.galagraft.view.PantallaJuego;
-import com.pdjteam.galagraft.config.*;
-import com.pdjteam.galagraft.engine.entities.Bullet;
+import com.pdjteam.galagraft.config.GameConfig;
 
+// strategies
+import com.pdjteam.galagraft.strategies.DisparoSimpleStrategy;
+import com.pdjteam.galagraft.strategies.EstrategiaDisparo;
+import com.pdjteam.galagraft.strategies.EstrategiaPotenciador;
 
+// Interfaz
+import com.pdjteam.galagraft.interfaces.Colisionable;
 
 public class Shulker extends EntidadDinamica {
-	
-	private boolean destruida = false;
-    private int vidas = 3;
-    private float xVel = 0;
-    private final float VELOCIDAD_NAVE = 6f; // velocidad fija manejable
-    
-    private Sprite spr;
-    private Sound sonidoHerido;
-    private Sound soundBala;
-    private Texture txBala;
-    
-    private boolean herido = false;
-    private int tiempoHeridoMax = 50;
-    private int tiempoHerido;
-    
-    public Shulker(int x, int y, Texture tx, Sound soundChoque, Texture txBala, Sound soundBala) {
-    	this.sonidoHerido = soundChoque;
-    	this.soundBala = soundBala;
-    	this.txBala = txBala;
-    	this.spr = new Sprite(tx);
-    	this.spr.setBounds(x, y, 45, 45);
-    }
-    
-    public void draw(SpriteBatch batch, PantallaJuego juego){
-        float x =  spr.getX();
-        float y =  spr.getY();
-        
-        if (!herido) {
-        	
-        	// resetear vector velocidad en cada frame para evitar inercia
-        	xVel = 0;
-        	
-        	if(Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
-        		xVel = -VELOCIDAD_NAVE;
-        	}
-	        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
-	        	xVel = VELOCIDAD_NAVE;
-	        }
-	        
-        	float newX = x + xVel;
-        	float newY = y; // la nave solo se mueve en horizontal
-        	
-        	// físicas de borde (colisiones) en vez de rebote
-        	if(newX < 0) newX = 0;
-        	else if(newX + spr.getWidth() > GameConfig.ANCHO_MUNDO) {
-        		newX = GameConfig.ANCHO_MUNDO - spr.getWidth();
-        	}
-        	
-        	if(newY < 0) newY = 0;
-        	else if(newY + spr.getHeight() > GameConfig.ALTO_MUNDO) {
-        		newY = GameConfig.ALTO_MUNDO - spr.getHeight();
-        	}
-         
-        	spr.setPosition(newX, newY);
-        	spr.draw(batch);
+    // GM-6 Singleton
+    private static Shulker instancia;
+    private static final float TAMANO_SHULKER = 64f;
+
+    // atributos encapsulados: GM-5
+    private int puntaje;
+    private float tiempoDesdeUltimoDisparo;
+    private final List<EfectoActivo> efectosActivos = new ArrayList<>(); // potenciadores en curso (Strategy GM-7)
+    private EstrategiaDisparo estrategiaDisparo; // referencia a Strategy (GM-7)
+    private Texture texturaBala;
+    private Sound sonidoDisparo;
+    private Sound sonidoDisparoJ;
+    private Sound sonidoHurt;
+    private List<Proyectil> proyectilesJuego;
+
+    // Un potenciador temporal en curso: su estrategia y los segundos que le quedan
+    private static class EfectoActivo {
+        private final EstrategiaPotenciador estrategia;
+        private float restante;
+
+        EfectoActivo(EstrategiaPotenciador estrategia, float restante) {
+            this.estrategia = estrategia;
+            this.restante = restante;
         }
-        
-        // Lógica de temblor al recibir daño
+    }
+
+    private Shulker(float x, float y, Texture texturaJugador, Texture texturaBala, 
+                    Sound sonidoDisparo, Sound sonidoDisparoJ, Sound sonidoHurt, List<Proyectil> proyectiles) {
+        super(x, y, 500f, 0f, GameConfig.VIDAS_INICIALES, texturaJugador);
+        this.puntaje = 0;
+        this.tiempoDesdeUltimoDisparo = 0f;
+        this.estrategiaDisparo = new DisparoSimpleStrategy();
+        this.texturaBala = texturaBala;
+        this.sonidoDisparo = sonidoDisparo;
+        this.sonidoDisparoJ = sonidoDisparoJ;
+        this.sonidoHurt = sonidoHurt;
+        this.proyectilesJuego = proyectiles;
+
+        if(getSprite() != null) {
+            getSprite().setSize(TAMANO_SHULKER, TAMANO_SHULKER);
+            getSprite().setPosition(x, y);
+        }
+    }
+
+    public static Shulker inicializarInstancia(float x, float y, Texture texJugador, Texture texBala,
+                                               Sound sDisparo, Sound sDisparoJ, Sound sHurt, List<Proyectil> proyectiles) {
+        if(instancia == null) {
+            instancia = new Shulker(x, y, texJugador, texBala, sDisparo, sDisparoJ, sHurt, proyectiles);
+        }
         else {
-        	spr.setX(spr.getX() + MathUtils.random(-2,2));
-        	spr.draw(batch); 
-        	spr.setX(x); // restaurar posición original
-        	tiempoHerido--;
-        	if (tiempoHerido <= 0) herido = false;
- 		 }
-        // mecánica de disparo
-        if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-        	Bullet  bala = new Bullet(spr.getX() + spr.getWidth()/2 - GameConfig.BALA_ANCHO/2, spr.getY() + spr.getHeight()-5, 0, 3, txBala);
-        	juego.agregarBala(bala);
-        	soundBala.play();
+            instancia.reiniciarEstado(x, y, texJugador, texBala, sDisparo, sDisparoJ, sHurt, proyectiles);
+        }
+        return instancia;
+    }
+
+    public static Shulker getInstancia() {
+        return instancia;
+    }
+
+    public void reiniciarEstado(float x, float y, Texture texJugador, Texture texBala,
+                                Sound sDisparo, Sound sDisparoJ, Sound sHurt, List<Proyectil> proyectiles) {
+        this.texturaBala = texBala;
+        this.sonidoDisparo = sDisparo;
+        this.sonidoDisparoJ = sDisparoJ;
+        this.sonidoHurt = sHurt;
+        this.proyectilesJuego = proyectiles;
+        this.tiempoDesdeUltimoDisparo = 0f;
+        // los potenciadores no pasan de una ronda a otra: se revierten sus efectos
+        revertirEfectosActivos();
+        this.estrategiaDisparo = new DisparoSimpleStrategy();
+
+        if(texJugador != null) {
+            Sprite nuevoSprite = new Sprite(texJugador);
+            nuevoSprite.setSize(TAMANO_SHULKER, TAMANO_SHULKER);
+            nuevoSprite.setPosition(x, y);
+            setSprite(nuevoSprite);
+        }
+        setX(x);
+        setY(y);
+        setActiva(true);
+    }
+
+    /**
+     * Activa un potenciador (Strategy GM-7): aplica su efecto y, si es temporal, lo revierte al expirar.
+     * Solo hay un efecto activo por categoría: el nuevo reemplaza al anterior.
+     */
+    public void activarPotenciador(EstrategiaPotenciador nuevo) {
+        if(nuevo == null) return;
+
+        for(int i = efectosActivos.size() - 1; i >= 0; i--) {
+            EfectoActivo activo = efectosActivos.get(i);
+            if(activo.estrategia.getCategoria().equals(nuevo.getCategoria())) {
+                activo.estrategia.revertir(this);
+                efectosActivos.remove(i);
+            }
+        }
+
+        nuevo.aplicar(this);
+
+        // duración 0 = efecto instantáneo (p. ej. vida extra): no hay nada que revertir después
+        if(nuevo.getDuracion() > 0) {
+            efectosActivos.add(new EfectoActivo(nuevo, nuevo.getDuracion()));
         }
     }
-      
-    public boolean checkCollision(Esqueleto b) {
-        if(!herido && b.getArea().overlaps(spr.getBoundingRectangle())) {
-            vidas--;
-            herido = true;
-  		    tiempoHerido = tiempoHeridoMax;
-  		    sonidoHerido.play();
-  		    
-            if (vidas <= 0) destruida = true;
-            return true;
+
+    private void actualizarEfectosActivos(float delta) {
+        for(int i = efectosActivos.size() - 1; i >= 0; i--) {
+            EfectoActivo activo = efectosActivos.get(i);
+            activo.restante -= delta;
+            if(activo.restante <= 0) {
+                activo.estrategia.revertir(this);
+                efectosActivos.remove(i);
+            }
         }
-        return false;
     }
+
+    private void revertirEfectosActivos() {
+        for(EfectoActivo activo : efectosActivos) {
+            activo.estrategia.revertir(this);
+        }
+        efectosActivos.clear();
+    }
+
+    /**
+     * Regla de munición: MAX_BALAS cuenta solo las balas del jugador (las enemigas no)
+     * y se ignora mientras hay un potenciador de disparo activo.
+     */
+    public boolean hayCupoDeBalas() {
+        for(EfectoActivo activo : efectosActivos) {
+            if(EstrategiaPotenciador.CATEGORIA_DISPARO.equals(activo.estrategia.getCategoria())) return true;
+        }
+
+        int balasJugador = 0;
+        for(Proyectil p : this.proyectilesJuego) {
+            if(p.isEsDelJugador()) balasJugador++;
+        }
+        return balasJugador < GameConfig.MAX_BALAS;
+    }
+
+    @Override
+    public void actualizar(float delta) {
+        if(!estaActiva()) return;
+
+        this.tiempoDesdeUltimoDisparo += delta;
+
+        actualizarEfectosActivos(delta);
+
+        if(Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {
+            setX(getX() - getVelocidadX() * delta);
+        }
+        if(Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {
+            setX(getX() + getVelocidadX() * delta);
+        }
+
+        float ancho = getSprite() != null ? getSprite().getWidth() : TAMANO_SHULKER;
+        
+        if(getX() < 0) setX(0);
+        if(getX() + ancho > GameConfig.ANCHO_MUNDO) {
+            setX(GameConfig.ANCHO_MUNDO - ancho);
+        }
+
+        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && 
+            this.tiempoDesdeUltimoDisparo >= this.estrategiaDisparo.getTiempoEnfriamiento() &&
+            hayCupoDeBalas()) {
+
+            this.estrategiaDisparo.ejecutarDisparo(this, this.proyectilesJuego, this.texturaBala);
+
+            if(MathUtils.random() < GameConfig.PROB_DISPARO_J) {
+                if(this.sonidoDisparoJ != null) this.sonidoDisparoJ.play();
+            }
+            else {
+                if(this.sonidoDisparo != null) this.sonidoDisparo.play();
+            }
+
+            this.tiempoDesdeUltimoDisparo = 0f;
+        }
+
+        sincronizarSprite();
+    }
+
+    @Override
+    public void alColisionar(Colisionable otro) {
+        if(otro instanceof Proyectil) {
+            Proyectil p = (Proyectil) otro;
+            if(!p.isEsDelJugador()) {
+                recibirDano(p.getDano());
+                if(this.sonidoHurt != null) this.sonidoHurt.play();
+            }
+        }
+        else if(otro instanceof Enemigo) {
+            recibirDano(1);
+            if(this.sonidoHurt != null) this.sonidoHurt.play();
+        }
+    }
+
+    public int getPuntaje() { return puntaje; }
+    public void setPuntaje(int puntaje) { this.puntaje = puntaje; }
+    public void agregarPuntaje(int puntos) { this.puntaje += puntos; }
     
-    public boolean estaDestruido() { return !herido && destruida; }
-    public boolean estaHerido() { return herido; }
-    public int getVidas() { return vidas; }
-    public int getX() { return (int) spr.getX(); }
-    public int getY() { return (int) spr.getY(); }
-	public void setVidas(int vidas2) { vidas = vidas2; }
-	
+    public float getTiempoDesdeUltimoDisparo() { return tiempoDesdeUltimoDisparo; }
+    public void setTiempoDesdeUltimoDisparo(float t) { this.tiempoDesdeUltimoDisparo = t; }
+    
+    public EstrategiaDisparo getEstrategiaDisparo() { return estrategiaDisparo; }
+    public void setEstrategiaDisparo(EstrategiaDisparo estrategia) { this.estrategiaDisparo = estrategia; }
+    
+    public Texture getTexturaBala() { return texturaBala; }
+    public void setTexturaBala(Texture texturaBala) { this.texturaBala = texturaBala; }
+    
+    public Sound getSonidoDisparo() { return sonidoDisparo; }
+    public void setSonidoDisparo(Sound sonidoDisparo) { this.sonidoDisparo = sonidoDisparo; }
+    
+    public Sound getSonidoDisparoJ() { return sonidoDisparoJ; }
+    public void setSonidoDisparoJ(Sound sonidoDisparoJ) { this.sonidoDisparoJ = sonidoDisparoJ; }
+    
+    public Sound getSonidoHurt() { return sonidoHurt; }
+    public void setSonidoHurt(Sound sonidoHurt) { this.sonidoHurt = sonidoHurt; }
+    
+    public List<Proyectil> getProyectilesJuego() { return proyectilesJuego; }
+    public void setProyectilesJuego(List<Proyectil> proyectiles) { this.proyectilesJuego = proyectiles; }
 }

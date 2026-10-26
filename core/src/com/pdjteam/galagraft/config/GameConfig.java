@@ -10,39 +10,64 @@ public final class GameConfig {
 	// Valores iniciales
 	public static final int VIDAS_INICIALES = 3;
 	public static final int ENEMIGOS_INICIAL = 10;
-	public static final int VEL_INICIAL = 1;
+	public static final int VEL_INICIAL = 5;
+	public static final int ENEMIGOS_MAX_PANTALLA_INICIAL = 10; // máximo de enemigos simultáneos en pantalla (ronda 1)
+	public static final int MAX_BALAS = 2; // tope de balas del jugador en pantalla (no cuenta las enemigas; se ignora con un potenciador activo)
 	
-	// Progresión por cada ronda
-	public static final int ENEMIGOS_POR_RONDA = 10;
-	public static final int VEL_POR_RONDA = 3;
+	// Progresión por cada ronda (los porcentajes son respecto de la ronda anterior)
+	public static final float CRECIMIENTO_ENEMIGOS = 0.30f;     // enemigos totales de la ronda
+	public static final float CRECIMIENTO_MAX_PANTALLA = 0.20f; // máximo de enemigos simultáneos en pantalla
+	public static final int VEL_POR_RONDA = 1;                  // aumento de velocidad de los enemigos por ronda
+	public static final int VEL_MAX = 10;                       // tope de velocidad de los enemigos (px por fotograma)
 	
 	// Puntajes
 	public static final int PUNTOS_POR_ENEMIGO = 10;
 	
 	// Audio
-	public static final float VOLUMEN_MUSICA = 0.1f;
+	public static final float VOLUMEN_MUSICA = 0.5f;
 	public static final float VOLUMEN_EXPLOSION = 0.1f;
+	
+	// Probabilidad (0 a 1) de que al disparar suene disparoJ en vez del sonido normal
+	public static final float PROB_DISPARO_J = 0.1f;
 	
 	// Tamaño de los disparos (bala.png mide 745x500, se escala para el juego)
 	public static final int BALA_ANCHO = 30;
 	public static final int BALA_ALTO = 20;
 	
+	// Potenciadores: lado (px) con que se dibujan y velocidad (px/s) a la que caen
+	public static final int POTENCIADOR_TAMANO = 48;
+	public static final float POTENCIADOR_VEL_CAIDA = 150f;
+	public static final float PROB_DROP_POTENCIADOR = 0.15f;  // probabilidad (0 a 1) de que un enemigo destruido suelte un potenciador
+	public static final float DURACION_DISPARO_TRIPLE = 10f;  // segundos que dura el disparo triple
+	
 	// Tamaño de cada tipo de enemigo (lado mayor en px), en el mismo orden que las texturas:
 	// GRANDE (ghast), MEDIANO (esqueleto), PEQUENO (blaze). Los PNG miden 512x512 y se reducen a este lado.
 	public static final int[] ENEMIGO_LADOS = { 110, 80, 80 };
 	
-	// Separación mínima (px) entre enemigos al aparecer y reintentos para encontrar un lugar libre
-	public static final int ENEMIGO_DISTANCIA_MIN = 20;
-	public static final int ENEMIGO_INTENTOS_SPAWN = 50;
+	// Formación de enemigos (estilo Galaga): aparecen en filas desde la esquina superior izquierda,
+	// avanzan en bloque hacia un lado y, al tocar el borde, bajan un escalón y cambian de sentido
+	public static final int ENEMIGOS_POR_FILA = 10;
+	public static final int ENEMIGO_DISTANCIA_MIN = 20; // separación (px) entre enemigos de la formación
+	public static final int FORMACION_MARGEN = 20;      // distancia (px) a los bordes laterales y superior
+	public static final int ENEMIGO_ESCALON = 60;       // cuánto bajan (px) al tocar un borde
+	public static final int INTERVALO_LINEA_MS = 3000;  // cada cuántos ms aparece una nueva línea de enemigos
+	public static final int ENEMIGOS_POR_ESCAPE = 5;    // enemigos que se suman al total de la ronda por cada uno que llega al fondo
 	
 	// Assets
+	public static final String FUENTE = "minecraftia.fnt";
 	public static final String SND_EXPLOSION = "explosion.ogg";
 	public static final String SND_DANO = "hurt.ogg";
 	public static final String SND_DISPARO = "shulker_sound.mp3";
-	public static final String SND_MUSICA_JUEGO = "piano-loops.wav";
+	public static final String SND_DISPARO_J = "disparoJ.mp3";
+	public static final String SND_MUSICA_JUEGO = "music.mp3";
 	public static final String TEX_SHULKER = "shulker.png";
 	public static final String TEX_BALA = "bala.png";
+	public static final String TEX_POTENCIADOR_TRIPLE = "tripleShot.png";
 	public static final String TEX_ENEMIGO_GRANDE = "Ghast.png";
 	public static final String TEX_ENEMIGO_MEDIANO = "esqueleto.png";
 	public static final String TEX_ENEMIGO_PEQUENO = "Blaze.png";
+	public static final String WPR_GAMEPLAY = "gameplay_wallpaper.png";
+	public static final String WPR_GAMEOVER = "game_over_screen.png";
+	public static final String WPR_GAMEOVER_TXT1 = "gameover1.png";
+	public static final String WPR_GAMEOVER_TXT2= "gameover2.png";
 }
