@@ -43,6 +43,23 @@ public final class GameConfig {
 	// Tamaño de cada tipo de enemigo (lado mayor en px), en el mismo orden que las texturas:
 	// GRANDE (ghast), MEDIANO (esqueleto), PEQUENO (blaze). Los PNG miden 512x512 y se reducen a este lado.
 	public static final int[] ENEMIGO_LADOS = { 110, 80, 80 };
+
+	// Tipo de cada enemigo: es el índice en ENEMIGO_LADOS y en el arreglo de texturas de enemigos
+	public static final int TIPO_GHAST = 0;
+	public static final int TIPO_ESQUELETO = 1;
+	public static final int TIPO_BLAZE = 2;
+
+	// Proyectiles enemigos: tamaño (px) con que se dibujan. Sus sprites están recortados a su dibujo,
+	// así que el área de colisión coincide con lo que se ve.
+	public static final int FLECHA_ANCHO = 17;            // flecha del esqueleto
+	public static final int FLECHA_ALTO = 56;
+	public static final int CARGA_FUEGO_LADO = 40;        // carga de fuego del blaze
+	public static final int CARGA_FUEGO_GHAST_LADO = 64;  // carga de fuego del ghast (más grande)
+
+	// Tiempo (s) entre disparos de cada enemigo: súbelo si la pantalla se llena de proyectiles enemigos
+	public static final float INTERVALO_DISPARO_ESQUELETO = 4.5f;
+	public static final float INTERVALO_DISPARO_BLAZE = 3.5f;
+	public static final float INTERVALO_DISPARO_GHAST = 6.0f;
 	
 	// Formación de enemigos (estilo Galaga): aparecen en filas desde la esquina superior izquierda,
 	// avanzan en bloque hacia un lado y, al tocar el borde, bajan un escalón y cambian de sentido
@@ -62,6 +79,8 @@ public final class GameConfig {
 	public static final String SND_MUSICA_JUEGO = "music.mp3";
 	public static final String TEX_SHULKER = "shulker.png";
 	public static final String TEX_BALA = "bala.png";
+	public static final String TEX_FLECHA = "flecha_recortada.png";
+	public static final String TEX_CARGA_FUEGO = "carga_fuego_recortada.png";
 	public static final String TEX_POTENCIADOR_TRIPLE = "tripleShot.png";
 	public static final String TEX_ENEMIGO_GRANDE = "Ghast.png";
 	public static final String TEX_ENEMIGO_MEDIANO = "esqueleto.png";

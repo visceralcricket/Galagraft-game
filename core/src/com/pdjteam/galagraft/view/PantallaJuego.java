@@ -38,6 +38,8 @@ public class PantallaJuego implements Screen {
 	private Music gameMusic;
 	private Texture texShulker;
 	private Texture texBala;
+	private Texture texFlecha;
+	private Texture texCargaFuego;
 	private CatalogoPotenciadores catalogoPotenciadores;
 	private Sound sndDano;
 	private Sound sndDisparo;
@@ -62,6 +64,8 @@ public class PantallaJuego implements Screen {
 		
 		texShulker = new Texture(Gdx.files.internal(GameConfig.TEX_SHULKER));
 		texBala = new Texture(Gdx.files.internal(GameConfig.TEX_BALA));
+		texFlecha = new Texture(Gdx.files.internal(GameConfig.TEX_FLECHA));
+		texCargaFuego = new Texture(Gdx.files.internal(GameConfig.TEX_CARGA_FUEGO));
 		catalogoPotenciadores = new CatalogoPotenciadores();
 		texEnemigos = new Texture[] {
 				new Texture(Gdx.files.internal(GameConfig.TEX_ENEMIGO_GRANDE)),
@@ -86,7 +90,7 @@ public class PantallaJuego implements Screen {
 		jugador.setVida(vidas);
 		jugador.setPuntaje(puntuacion);
 
-		logica = new GameLogic(jugador, ronda, puntuacion, velXEnemigos, velYEnemigos, cantEnemigos, maxEnPantalla, texEnemigos, catalogoPotenciadores);
+		logica = new GameLogic(jugador, ronda, puntuacion, velXEnemigos, velYEnemigos, cantEnemigos, maxEnPantalla, texEnemigos, texFlecha, texCargaFuego, catalogoPotenciadores);
 	}
     
 	public void dibujaEncabezado() {
@@ -213,6 +217,8 @@ public class PantallaJuego implements Screen {
 		gameMusic.dispose();
 		texShulker.dispose();
 		texBala.dispose();
+		texFlecha.dispose();
+		texCargaFuego.dispose();
 		catalogoPotenciadores.dispose();
 		for(Texture t : texEnemigos) t.dispose();
 		sndDano.dispose();
