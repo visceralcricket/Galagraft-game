@@ -20,6 +20,12 @@ public class Proyectil implements Colisionable {
     private Sprite sprite;
 
     public Proyectil(float x, float y, float velocidadX, float velocidadY, int dano, boolean esDelJugador, Texture textura) {
+        this(x, y, velocidadX, velocidadY, dano, esDelJugador, textura, GameConfig.BALA_ANCHO, GameConfig.BALA_ALTO);
+    }
+
+    // Variante con tamaño propio, para los proyectiles que no miden lo mismo que la bala del jugador
+    public Proyectil(float x, float y, float velocidadX, float velocidadY, int dano, boolean esDelJugador, Texture textura,
+                     float ancho, float alto) {
         this.x = x;
         this.y = y;
         this.velocidadX = velocidadX;
@@ -28,7 +34,7 @@ public class Proyectil implements Colisionable {
         this.esDelJugador = esDelJugador;
         this.activa = true;
         this.sprite = new Sprite(textura);
-        this.sprite.setSize(GameConfig.BALA_ANCHO, GameConfig.BALA_ALTO);
+        this.sprite.setSize(ancho, alto);
         this.sprite.setPosition(x, y);
     }
 

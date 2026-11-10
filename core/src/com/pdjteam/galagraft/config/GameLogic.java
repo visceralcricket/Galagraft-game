@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.pdjteam.galagraft.engine.entities.Enemigo;
 import com.pdjteam.galagraft.engine.entities.EnemigoBlaze;
 import com.pdjteam.galagraft.engine.entities.EnemigoEsqueleto;
+import com.pdjteam.galagraft.engine.entities.EnemigoGhast;
 import com.pdjteam.galagraft.engine.entities.Potenciador;
 import com.pdjteam.galagraft.engine.entities.Proyectil;
 import com.pdjteam.galagraft.engine.entities.Shulker;
@@ -27,6 +28,8 @@ public class GameLogic {
     private final List<Potenciador> potenciadores = new ArrayList<>();
 
     private final Texture[] texEnemigos;
+    private final Texture texFlecha;
+    private final Texture texCargaFuego;
     private final CatalogoPotenciadores catalogoPotenciadores;
     private final Random azar = new Random();
 
@@ -55,6 +58,8 @@ public class GameLogic {
             int cantEnemigos,
             int maxEnPantalla,
             Texture[] texEnemigos,
+            Texture texFlecha,
+            Texture texCargaFuego,
             CatalogoPotenciadores catalogoPotenciadores) {
 
         this.jugador = jugador;
@@ -65,6 +70,8 @@ public class GameLogic {
         this.cantEnemigos = cantEnemigos;
         this.maxEnPantalla = maxEnPantalla;
         this.texEnemigos = texEnemigos;
+        this.texFlecha = texFlecha;
+        this.texCargaFuego = texCargaFuego;
         this.catalogoPotenciadores = catalogoPotenciadores;
 
         // Shulker administra la lista de proyectiles del juego.
@@ -129,12 +136,18 @@ public class GameLogic {
                     + (celda - lado) / 2;
             
             int y = yAparicion + (celda - lado) / 2;
+            // el tipo define a la vez el sprite y la clase: cada mob dispara su propio proyectil
             Enemigo e;
-            if(azar.nextBoolean()) {
-                e = new EnemigoEsqueleto(x, y, texEnemigos[tipo], jugador.getTexturaBala(), balas);
-            }
-            else {
-                e = new EnemigoBlaze(x, y, texEnemigos[tipo], jugador.getTexturaBala(), balas);
+            switch(tipo) {
+                case GameConfig.TIPO_GHAST:
+                    e = new EnemigoGhast(x, y, texEnemigos[tipo], texCargaFuego, balas);
+                    break;
+                case GameConfig.TIPO_ESQUELETO:
+                    e = new EnemigoEsqueleto(x, y, texEnemigos[tipo], texFlecha, balas);
+                    break;
+                default:
+                    e = new EnemigoBlaze(x, y, texEnemigos[tipo], texCargaFuego, balas);
+                    break;
             }
             
             if(e.getSprite() != null) e.getSprite().setSize(lado, lado);
@@ -268,6 +281,13 @@ public class GameLogic {
         }
     }
 
+    // Cada enemigo ejecuta su ciclo propio (Template Method GM-8): temporizadores, movimiento propio y ataque
+    private void actualizarEnemigos(float delta) {
+        for(Enemigo e : mobs1) {
+            e.actualizar(delta);
+        }
+    }
+
     public int actualizar(float delta) {
         int destruidos = 0;
         if(!jugador.estaActiva()) {
@@ -283,6 +303,12 @@ public class GameLogic {
                 continue;
             }
             if(!p.isEsDelJugador()) {
+                // proyectil enemigo: si alcanza al Shulker le quita vida y desaparece
+                if(p.verificarColision(jugador)) {
+                    jugador.alColisionar(p);
+                    p.alColisionar(jugador);
+                    balas.remove(i);
+                }
                 continue;
             }
             for(int j = mobs1.size() - 1; j >= 0; j--) {
@@ -308,6 +334,7 @@ public class GameLogic {
         generarLineas(delta);
         moverFormacion();
         eliminarEscapados();
+        actualizarEnemigos(delta);
         return destruidos;
     }
 

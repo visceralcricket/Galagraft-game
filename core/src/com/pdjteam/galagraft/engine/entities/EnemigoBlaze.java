@@ -5,20 +5,12 @@ import java.util.List;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 
+import com.pdjteam.galagraft.config.GameConfig;
+
 public class EnemigoBlaze extends Enemigo {
-    private float tiempoVida;
 
     public EnemigoBlaze(float x, float y, Texture texBlaze, Texture texCargaFuego, List<Proyectil> proyectiles) {
-        super(x, y, 160f, -25f, 3, 1.4f, 250, texBlaze, texCargaFuego, proyectiles);
-        this.tiempoVida = 0f;
-    }
-
-    @Override
-    protected void ejecutarMovimiento(float delta) {
-        this.tiempoVida += delta;
-        float desplazamientoOndulatorio = MathUtils.sin(this.tiempoVida * 5f) * getVelocidadX();
-        setX(getX() + desplazamientoOndulatorio * delta);
-        setY(getY() + getVelocidadY() * delta);
+        super(x, y, 160f, -25f, 3, GameConfig.INTERVALO_DISPARO_BLAZE, 250, texBlaze, texCargaFuego, proyectiles);
     }
 
     @Override
@@ -29,9 +21,8 @@ public class EnemigoBlaze extends Enemigo {
             float diffX = Shulker.getInstancia().getX() - centroX;
             direccionX = MathUtils.clamp(diffX, -120f, 120f);
         }
-        return new Proyectil(centroX, getY(), direccionX, -320f, 2, false, getTexturaProyectil());
+        // carga de fuego que sale justo bajo el blaze, apuntada hacia el jugador
+        float lado = GameConfig.CARGA_FUEGO_LADO;
+        return new Proyectil(centroX - lado / 2f, getY() - lado, direccionX, -320f, 2, false, getTexturaProyectil(), lado, lado);
     }
-
-    public float getTiempoVida() { return tiempoVida; }
-    public void setTiempoVida(float tiempoVida) { this.tiempoVida = tiempoVida; }
 }

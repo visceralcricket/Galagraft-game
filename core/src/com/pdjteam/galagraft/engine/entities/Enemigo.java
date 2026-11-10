@@ -1,8 +1,8 @@
 package com.pdjteam.galagraft.engine.entities;
 
 import java.util.List;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.math.MathUtils;
 
 // interfaz
 import com.pdjteam.galagraft.interfaces.Colisionable;
@@ -17,7 +17,8 @@ public abstract class Enemigo extends EntidadDinamica {
     public Enemigo(float x, float y, float vx, float vy, int vidaMaxima, float intervaloDisparo, 
                    int puntaje, Texture texturaEnemigo, Texture texturaProyectil, List<Proyectil> proyectiles) {
         super(x, y, vx, vy, vidaMaxima, texturaEnemigo);
-        this.tiempoDesdeUltimoDisparo = 0f;
+        // desfase al azar: así los enemigos de una misma fila no disparan todos en el mismo instante
+        this.tiempoDesdeUltimoDisparo = MathUtils.random(0f, intervaloDisparo);
         this.intervaloDisparo = intervaloDisparo;
         this.puntajeOtorgado = puntaje;
         this.texturaProyectil = texturaProyectil;
@@ -27,6 +28,8 @@ public abstract class Enemigo extends EntidadDinamica {
     /**
      * TEMPLATE METHOD (GM 8): Plantilla invariante del ciclo de vida de un enemigo en cada frame.
      * Es 'final' para evitar que las subclases modifiquen el orden de ejecución.
+     * GameLogic la invoca en cada fotograma para cada enemigo. El desplazamiento en formación y
+     * los límites de la pantalla los controla GameLogic, así que aquí solo vive el ciclo propio del enemigo.
      */
     @Override
     public final void actualizar(float delta) {
@@ -35,11 +38,8 @@ public abstract class Enemigo extends EntidadDinamica {
         // actualizar cooldowns
         actualizarTemporizadores(delta);
 
-        // cada mob se mueve distinto
+        // gancho: movimiento propio (por defecto ninguno, la formación mueve al enemigo)
         ejecutarMovimiento(delta);
-
-        // rebotar en bordes laterales
-        verificarLimitesPantalla();
 
         // gancho + operación abstracta de ataque
         if(puedeAtacar()) {
@@ -57,22 +57,6 @@ public abstract class Enemigo extends EntidadDinamica {
         this.tiempoDesdeUltimoDisparo += delta;
     }
 
-    protected void verificarLimitesPantalla() {
-        float anchoSprite = getSprite() != null ? getSprite().getWidth() : 32f;
-        if(getX() <= 0) {
-            setX(0);
-            setVelocidadX(Math.abs(getVelocidadX()));
-        }
-        else if(getX() + anchoSprite >= Gdx.graphics.getWidth()) {
-            setX(Gdx.graphics.getWidth() - anchoSprite);
-            setVelocidadX(-Math.abs(getVelocidadX()));
-        }
-
-        if(getY() < -anchoSprite) {
-            setActiva(false);
-        }
-    }
-
     protected boolean puedeAtacar() {
         return this.tiempoDesdeUltimoDisparo >= this.intervaloDisparo;
     }
@@ -81,8 +65,11 @@ public abstract class Enemigo extends EntidadDinamica {
         this.tiempoDesdeUltimoDisparo = 0f;
     }
 
-    // Operaciones  abstractas que deben implementar Esqueleto, Blaze y Ghast
-    protected abstract void ejecutarMovimiento(float delta);
+    // Gancho: movimiento propio de cada enemigo. Por defecto no hace nada porque la formación de GameLogic
+    // es quien lo desplaza; un enemigo que necesite moverse distinto puede sobrescribirlo.
+    protected void ejecutarMovimiento(float delta) { }
+
+    // Operación abstracta que deben implementar Esqueleto, Blaze y cualquier enemigo nuevo
     protected abstract Proyectil crearProyectilAtaque();
 
     @Override
