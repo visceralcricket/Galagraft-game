@@ -11,7 +11,8 @@ public class DisparoTriplePowerUpStrategy implements EstrategiaDisparo, Estrateg
     private float enfriamiento = 0.22f; // Power-up: mayor cadencia + triple proyectil en abanico
 
     @Override
-    public void ejecutarDisparo(Shulker jugador, List<Proyectil> proyectiles, Texture texturaBala) {
+    public void ejecutarDisparo(List<Proyectil> proyectiles, Texture texturaBala) {
+    	Shulker jugador = Shulker.getInstancia();
         float xCentral = jugador.getX() + (jugador.getSprite().getWidth() / 2f) - 4f;
         float ySalida = jugador.getY() + jugador.getSprite().getHeight();
 

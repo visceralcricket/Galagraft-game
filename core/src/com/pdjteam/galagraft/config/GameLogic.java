@@ -44,7 +44,8 @@ public class GameLogic {
             Texture texCargaFuego,
             CatalogoPotenciadores catalogoPotenciadores) {
 
-        this.jugador = jugador;
+    	// obtener instancia de Shulker
+        this.jugador = Shulker.getInstancia();
         this.puntuacion = puntuacion;
         this.catalogoPotenciadores = catalogoPotenciadores;
         this.balas = jugador.getProyectilesJuego();
@@ -116,13 +117,18 @@ public class GameLogic {
             for (int j = enemigos.size() - 1; j >= 0; j--) {
                 Enemigo enemigo = enemigos.get(j);
                 if(p.verificarColision(enemigo)) {
-                    p.setActiva(false);
-                    balas.remove(i);
-                    oleadaActual.eliminarEnemigo(j);
-                    soltarPotenciador(enemigo);
-                    puntuacion += GameConfig.PUNTOS_POR_ENEMIGO;
-                    jugador.agregarPuntaje(GameConfig.PUNTOS_POR_ENEMIGO);
-                    destruidos++;
+                    p.alColisionar(enemigo);
+                    enemigo.alColisionar(p);
+                    if(!enemigo.estaActiva()) {
+                        oleadaActual.eliminarEnemigo(j);
+                        soltarPotenciador(enemigo);
+                        puntuacion += GameConfig.PUNTOS_POR_ENEMIGO;
+                        jugador.agregarPuntaje(GameConfig.PUNTOS_POR_ENEMIGO);
+                        destruidos++;
+                    }
+                    if (!p.estaActiva()) {
+                        balas.remove(i);
+                    }
                     break;
                 }
             }

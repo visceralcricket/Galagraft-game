@@ -8,7 +8,7 @@ import com.pdjteam.galagraft.engine.entities.Proyectil;
 import com.pdjteam.galagraft.engine.entities.Shulker;
 
 public interface EstrategiaDisparo {
-    void ejecutarDisparo(Shulker jugador, List<Proyectil> proyectiles, Texture texturaBala);
+    void ejecutarDisparo(List<Proyectil> proyectiles, Texture texturaBala);
     float getTiempoEnfriamiento();
     String getNombreEstrategia();
 }

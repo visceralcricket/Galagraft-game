@@ -185,7 +185,7 @@ public class Shulker extends EntidadDinamica {
             this.tiempoDesdeUltimoDisparo >= this.estrategiaDisparo.getTiempoEnfriamiento() &&
             hayCupoDeBalas()) {
 
-            this.estrategiaDisparo.ejecutarDisparo(this, this.proyectilesJuego, this.texturaBala);
+            this.estrategiaDisparo.ejecutarDisparo(this.proyectilesJuego, this.texturaBala);
 
             if(MathUtils.random() < GameConfig.PROB_DISPARO_J) {
                 if(this.sonidoDisparoJ != null) this.sonidoDisparoJ.play();
@@ -202,16 +202,35 @@ public class Shulker extends EntidadDinamica {
 
     @Override
     public void alColisionar(Colisionable otro) {
-        if(otro instanceof Proyectil) {
-            Proyectil p = (Proyectil) otro;
-            if(!p.isEsDelJugador()) {
-                recibirDano(p.getDano());
-                if(this.sonidoHurt != null) this.sonidoHurt.play();
-            }
+        if (!estaActiva() || otro == null || !otro.estaActiva()) return;
+        otro.recibirColisionDeJugador(this);
+    }
+
+    @Override
+    public void recibirColisionDeEnemigo(Enemigo enemigo) {
+        this.recibirDano(1);
+        if (this.sonidoHurt != null) {
+            this.sonidoHurt.play();
         }
-        else if(otro instanceof Enemigo) {
-            recibirDano(1);
-            if(this.sonidoHurt != null) this.sonidoHurt.play();
+        enemigo.setActiva(false);
+    }
+
+    @Override
+    public void recibirColisionDeProyectil(Proyectil proyectil) {
+        if (!proyectil.isEsDelJugador()) {
+            this.recibirDano(1);
+            if (this.sonidoHurt != null) {
+                this.sonidoHurt.play();
+            }
+            proyectil.setActiva(false);
+        }
+    }
+
+    @Override
+    public void recibirColisionDePotenciador(Potenciador potenciador) {
+        if (potenciador.estaActiva()) {
+            this.activarPotenciador(potenciador.getEstrategia());
+            potenciador.setActiva(false);
         }
     }
 

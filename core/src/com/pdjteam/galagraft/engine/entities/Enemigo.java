@@ -74,12 +74,21 @@ public abstract class Enemigo extends EntidadDinamica {
 
     @Override
     public void alColisionar(Colisionable otro) {
-        if(otro instanceof Proyectil) {
-            Proyectil p = (Proyectil) otro;
-            if(p.isEsDelJugador()) {
-                recibirDano(p.getDano());
-            }
+        if (!estaActiva() || otro == null || !otro.estaActiva()) return;
+        otro.recibirColisionDeEnemigo(this);
+    }
+
+    @Override
+    public void recibirColisionDeProyectil(Proyectil proyectil) {
+        if (proyectil.isEsDelJugador()) {
+            this.recibirDano(1);
+            proyectil.setActiva(false);
         }
+    }
+
+    @Override
+    public void recibirColisionDeJugador(Shulker jugador) {
+        jugador.recibirColisionDeEnemigo(this);
     }
     
     private int fila;

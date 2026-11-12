@@ -11,7 +11,8 @@ public class DisparoSimpleStrategy implements EstrategiaDisparo {
     private float enfriamiento = 0.35f;
 
     @Override
-    public void ejecutarDisparo(Shulker jugador, List<Proyectil> proyectiles, Texture texturaBala) {
+    public void ejecutarDisparo(List<Proyectil> proyectiles, Texture texturaBala) {
+    	Shulker jugador = Shulker.getInstancia();
         float xCentral = jugador.getX() + (jugador.getSprite().getWidth() / 2f) - 4f;
         float ySalida = jugador.getY() + jugador.getSprite().getHeight();
         proyectiles.add(new Proyectil(xCentral, ySalida, 0f, 450f, 1, true, texturaBala));

@@ -69,9 +69,13 @@ public class Potenciador extends EntidadDinamica {
     // Solo el Shulker puede recoger un potenciador
     @Override
     public void alColisionar(Colisionable otro) {
-        if(otro instanceof Shulker) {
-            recoger((Shulker) otro);
-        }
+        if (!estaActiva() || otro == null || !otro.estaActiva()) return;
+        otro.recibirColisionDePotenciador(this);
+    }
+
+    @Override
+    public void recibirColisionDeJugador(Shulker jugador) {
+        jugador.recibirColisionDePotenciador(this);
     }
 
     // Getters y Setters

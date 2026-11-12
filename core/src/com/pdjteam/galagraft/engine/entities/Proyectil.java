@@ -69,7 +69,23 @@ public class Proyectil implements Colisionable {
 
     @Override
     public void alColisionar(Colisionable otro) {
-        this.activa = false;
+        if (!estaActiva() || otro == null || !otro.estaActiva()) return;
+        otro.recibirColisionDeProyectil(this);
+    }
+
+    @Override
+    public void recibirColisionDeEnemigo(Enemigo enemigo) {
+        if (this.esDelJugador) {
+            enemigo.recibirDano(1);
+            this.setActiva(false);
+        }
+    }
+
+    @Override
+    public void recibirColisionDeJugador(Shulker jugador) {
+        if (!this.esDelJugador) {
+            jugador.recibirColisionDeProyectil(this);
+        }
     }
 
     @Override
