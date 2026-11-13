@@ -111,14 +111,13 @@ public class Shulker extends EntidadDinamica {
         for(int i = efectosActivos.size() - 1; i >= 0; i--) {
             EfectoActivo activo = efectosActivos.get(i);
             if(activo.estrategia.getCategoria().equals(nuevo.getCategoria())) {
-                activo.estrategia.revertir(this);
+                activo.estrategia.revertir();
                 efectosActivos.remove(i);
             }
         }
 
-        nuevo.aplicar(this);
+        nuevo.aplicar();
 
-        // duración 0 = efecto instantáneo (p. ej. vida extra): no hay nada que revertir después
         if(nuevo.getDuracion() > 0) {
             efectosActivos.add(new EfectoActivo(nuevo, nuevo.getDuracion()));
         }
@@ -129,7 +128,7 @@ public class Shulker extends EntidadDinamica {
             EfectoActivo activo = efectosActivos.get(i);
             activo.restante -= delta;
             if(activo.restante <= 0) {
-                activo.estrategia.revertir(this);
+                activo.estrategia.revertir();
                 efectosActivos.remove(i);
             }
         }
@@ -137,7 +136,7 @@ public class Shulker extends EntidadDinamica {
 
     private void revertirEfectosActivos() {
         for(EfectoActivo activo : efectosActivos) {
-            activo.estrategia.revertir(this);
+            activo.estrategia.revertir();
         }
         efectosActivos.clear();
     }
@@ -230,8 +229,7 @@ public class Shulker extends EntidadDinamica {
     @Override
     public void recibirColisionDePotenciador(Potenciador potenciador) {
         if (potenciador.estaActiva()) {
-            this.activarPotenciador(potenciador.getEstrategia());
-            potenciador.setActiva(false);
+            potenciador.recoger();
         }
     }
 

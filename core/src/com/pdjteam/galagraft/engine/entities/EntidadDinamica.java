@@ -50,6 +50,7 @@ public abstract class EntidadDinamica implements Colisionable {
     }
 
     public void recibirDano(int cantidad) {
+    	if(this.vidaMaxima <= 0) return; // Entidades no-combatientes no gestionan vida
         this.vida -= cantidad;
         if (this.vida <= 0) {
             this.vida = 0;

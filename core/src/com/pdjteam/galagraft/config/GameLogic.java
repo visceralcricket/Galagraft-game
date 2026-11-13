@@ -159,6 +159,9 @@ public class GameLogic {
 
         actualizarPotenciadores(delta);
         sincronizarCupoBalasJugador();
+        jugador.actualizar(delta);
+        balas.addAll(jugador.recogerProyectilesDisparados());
+        
         return destruidos;
     }
 

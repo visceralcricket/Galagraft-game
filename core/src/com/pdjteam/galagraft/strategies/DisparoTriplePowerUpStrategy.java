@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import com.badlogic.gdx.graphics.Texture;
 import com.pdjteam.galagraft.engine.entities.Proyectil;
 import com.pdjteam.galagraft.engine.entities.Shulker;
-
 import com.pdjteam.galagraft.config.GameConfig;
 
 public class DisparoTriplePowerUpStrategy implements EstrategiaDisparo, EstrategiaPotenciador {
@@ -31,12 +30,11 @@ public class DisparoTriplePowerUpStrategy implements EstrategiaDisparo, Estrateg
     @Override
     public String getNombreEstrategia() { return "Power-Up Triple"; }
 
-    
     @Override
-    public void aplicar(Shulker jugador) { jugador.setEstrategiaDisparo(this); }
+    public void aplicar() { Shulker.getInstancia().setEstrategiaDisparo(this); }
 
     @Override
-    public void revertir(Shulker jugador) { jugador.setEstrategiaDisparo(new DisparoSimpleStrategy()); }
+    public void revertir() { Shulker.getInstancia().setEstrategiaDisparo(new DisparoSimpleStrategy()); }
 
     @Override
     public float getDuracion() { return GameConfig.DURACION_DISPARO_TRIPLE; }

@@ -131,10 +131,9 @@ public class PantallaJuego implements Screen {
 		batch.setProjectionMatrix(camera.combined);
 		
 		if(!pausado) {
-			logica.getJugador().actualizar(delta);
 			if(logica.actualizar(delta) > 0) {
-				explosionSound.play(GameConfig.VOLUMEN_EXPLOSION);
-			}
+		        explosionSound.play(GameConfig.VOLUMEN_EXPLOSION);
+		    }
 		}
 		
 		batch.begin();
