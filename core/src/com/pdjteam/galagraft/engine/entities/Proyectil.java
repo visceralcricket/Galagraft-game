@@ -1,23 +1,12 @@
 package com.pdjteam.galagraft.engine.entities;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
-
 import com.pdjteam.galagraft.config.GameConfig;
-
 import com.pdjteam.galagraft.interfaces.Colisionable;
 
-public class Proyectil implements Colisionable {
-    private float x;
-    private float y;
-    private float velocidadX;
-    private float velocidadY;
+public class Proyectil extends EntidadDinamica {
     private int dano;
     private boolean esDelJugador;
-    private boolean activa;
-    private Sprite sprite;
 
     public Proyectil(float x, float y, float velocidadX, float velocidadY, int dano, boolean esDelJugador, Texture textura) {
         this(x, y, velocidadX, velocidadY, dano, esDelJugador, textura, GameConfig.BALA_ANCHO, GameConfig.BALA_ALTO);
@@ -26,45 +15,28 @@ public class Proyectil implements Colisionable {
     // Variante con tamaño propio, para los proyectiles que no miden lo mismo que la bala del jugador
     public Proyectil(float x, float y, float velocidadX, float velocidadY, int dano, boolean esDelJugador, Texture textura,
                      float ancho, float alto) {
-        this.x = x;
-        this.y = y;
-        this.velocidadX = velocidadX;
-        this.velocidadY = velocidadY;
+        super(x, y, velocidadX, velocidadY, textura);
         this.dano = dano;
         this.esDelJugador = esDelJugador;
-        this.activa = true;
-        this.sprite = new Sprite(textura);
-        this.sprite.setSize(ancho, alto);
-        this.sprite.setPosition(x, y);
+        if (getSprite() != null) {
+            getSprite().setSize(ancho, alto);
+            getSprite().setPosition(x, y);
+        }
     }
 
+    @Override
     public void actualizar(float delta) {
-        if(!this.activa) return;
-        this.x += this.velocidadX * delta;
-        this.y += this.velocidadY * delta;
-        this.sprite.setPosition(this.x, this.y);
+        if(!estaActiva()) return;
+        setX(getX() + getVelocidadX() * delta);
+        setY(getY() + getVelocidadY() * delta);
 
-        if(this.y > GameConfig.ALTO_MUNDO || this.y < -this.sprite.getHeight() ||
-            this.x < -this.sprite.getWidth() || this.x > GameConfig.ANCHO_MUNDO) {
-            this.activa = false;
+        float alto = getSprite() != null ? getSprite().getHeight() : GameConfig.BALA_ALTO;
+        float ancho = getSprite() != null ? getSprite().getWidth() : GameConfig.BALA_ANCHO;
+
+        if(getY() > GameConfig.ALTO_MUNDO || getY() < -alto ||
+            getX() < -ancho || getX() > GameConfig.ANCHO_MUNDO) {
+            setActiva(false);
         }
-    }
-
-    public void dibujar(SpriteBatch batch) {
-        if(this.activa && this.sprite != null && this.sprite.getTexture() != null) {
-            this.sprite.draw(batch);
-        }
-    }
-
-    @Override
-    public Rectangle getAreaColision() {
-        return this.sprite.getBoundingRectangle();
-    }
-
-    @Override
-    public boolean verificarColision(Colisionable otro) {
-        if(!this.activa || !otro.estaActiva()) return false;
-        return this.getAreaColision().overlaps(otro.getAreaColision());
     }
 
     @Override
@@ -76,7 +48,7 @@ public class Proyectil implements Colisionable {
     @Override
     public void recibirColisionDeEnemigo(Enemigo enemigo) {
         if (this.esDelJugador) {
-            enemigo.recibirDano(1);
+            enemigo.recibirDano(this.dano);
             this.setActiva(false);
         }
     }
@@ -88,29 +60,9 @@ public class Proyectil implements Colisionable {
         }
     }
 
-    @Override
-    public boolean estaActiva() { return activa; }
-
-    public float getX() { return x; }
-    public void setX(float x) { this.x = x; }
-    
-    public float getY() { return y; }
-    public void setY(float y) { this.y = y; }
-    
-    public float getVelocidadX() { return velocidadX; }
-    public void setVelocidadX(float velocidadX) { this.velocidadX = velocidadX; }
-    
-    public float getVelocidadY() { return velocidadY; }
-    public void setVelocidadY(float velocidadY) { this.velocidadY = velocidadY; }
-    
     public int getDano() { return dano; }
     public void setDano(int dano) { this.dano = dano; }
     
     public boolean isEsDelJugador() { return esDelJugador; }
     public void setEsDelJugador(boolean esDelJugador) { this.esDelJugador = esDelJugador; }
-    
-    public void setActiva(boolean activa) { this.activa = activa; }
-    
-    public Sprite getSprite() { return sprite; }
-    public void setSprite(Sprite sprite) { this.sprite = sprite; }
 }
