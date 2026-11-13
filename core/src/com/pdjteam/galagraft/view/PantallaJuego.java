@@ -17,7 +17,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.pdjteam.galagraft.Galagraft;
 import com.pdjteam.galagraft.engine.entities.*;
 import com.pdjteam.galagraft.engine.powerups.CatalogoPotenciadores;
-import com.pdjteam.galagraft.strategies.DisparoTriplePowerUpStrategy;
 import com.pdjteam.galagraft.config.*;
 
 public class PantallaJuego implements Screen {
