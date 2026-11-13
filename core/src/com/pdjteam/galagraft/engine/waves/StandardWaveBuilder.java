@@ -32,7 +32,7 @@ public class StandardWaveBuilder implements WaveBuilder {
     @Override
     public void buildCadenciaAparicion(int numeroRonda) {
         float reduccion = Math.max(0, numeroRonda - 1) * 150f;
-        float intervalo = Math.max(1200f, GameConfig.TIEMPO_ENTRE_LINEAS_MS - reduccion);
+        float intervalo = Math.max(1200f, GameConfig.INTERVALO_LINEA_MS - reduccion);
         oleada.setIntervaloSpawnMs(intervalo);
     }
 
