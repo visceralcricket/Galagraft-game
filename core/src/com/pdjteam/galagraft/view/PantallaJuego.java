@@ -1,6 +1,5 @@
 package com.pdjteam.galagraft.view;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
@@ -16,7 +15,6 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 import com.pdjteam.galagraft.Galagraft;
-
 import com.pdjteam.galagraft.engine.entities.*;
 import com.pdjteam.galagraft.engine.powerups.CatalogoPotenciadores;
 import com.pdjteam.galagraft.strategies.DisparoTriplePowerUpStrategy;
@@ -31,7 +29,6 @@ public class PantallaJuego implements Screen {
 	
 	private GameLogic logica;
 	private Texture[] texEnemigos;
-	private List<Proyectil> proyectiles;
 	
 	private Texture fondo;
 	private Sound explosionSound;
@@ -52,7 +49,6 @@ public class PantallaJuego implements Screen {
 		this.batch = game.getBatch();
 		this.camera = new OrthographicCamera();
 		this.viewport = new FitViewport(GameConfig.ANCHO_MUNDO, GameConfig.ALTO_MUNDO, camera);
-		this.proyectiles = new ArrayList<>();
 		
 		explosionSound = Gdx.audio.newSound(Gdx.files.internal(GameConfig.SND_EXPLOSION));
 		gameMusic = Gdx.audio.newMusic(Gdx.files.internal(GameConfig.SND_MUSICA_JUEGO));
@@ -83,14 +79,24 @@ public class PantallaJuego implements Screen {
 				texBala, 
 				sndDisparo,
 				sndDisparoJ, 
-				sndDano, 
-				proyectiles
+				sndDano
 		);
 		jugador.setVidaMaxima(Math.max(vidas, GameConfig.VIDAS_INICIALES));
 		jugador.setVida(vidas);
 		jugador.setPuntaje(puntuacion);
 
-		logica = new GameLogic(jugador, ronda, puntuacion, velXEnemigos, velYEnemigos, cantEnemigos, maxEnPantalla, texEnemigos, texFlecha, texCargaFuego, catalogoPotenciadores);
+		logica = new GameLogic(
+				ronda,
+				puntuacion,
+				velXEnemigos,
+				velYEnemigos,
+				cantEnemigos,
+				maxEnPantalla,
+				texEnemigos,
+				texFlecha,
+				texCargaFuego,
+				catalogoPotenciadores
+		);
 	}
     
 	public void dibujaEncabezado() {
@@ -125,10 +131,9 @@ public class PantallaJuego implements Screen {
 		batch.setProjectionMatrix(camera.combined);
 		
 		if(!pausado) {
-			logica.getJugador().actualizar(delta);
 			if(logica.actualizar(delta) > 0) {
-				explosionSound.play(GameConfig.VOLUMEN_EXPLOSION);
-			}
+		        explosionSound.play(GameConfig.VOLUMEN_EXPLOSION);
+		    }
 		}
 		
 		batch.begin();
@@ -147,15 +152,9 @@ public class PantallaJuego implements Screen {
 
 		logica.getJugador().dibujar(batch);
 
-		ArrayList<Enemigo> enemigos = logica.getEnemigos();
-		for(int i = 0; i < enemigos.size(); i++) {
-			Enemigo e = enemigos.get(i);
+		List<Enemigo> enemigos = logica.getEnemigos();
+		for(Enemigo e : enemigos) {
 			e.dibujar(batch);
-			if(!pausado && logica.getJugador().verificarColision(e)) {
-				logica.getJugador().alColisionar(e);
-				logica.eliminarEnemigo(i);
-				i--;
-			}   	  
 		}
 
 		if(pausado) {
@@ -173,12 +172,17 @@ public class PantallaJuego implements Screen {
 		}
 
 		if(!pausado && logica.rondaCompletada()) {
-			Screen ss = new PantallaJuego(game, logica.getRonda() + 1, logica.getJugador().getVida(),
-					logica.getPuntuacion(),
-					Math.min(GameConfig.VEL_MAX, logica.getVelX() + GameConfig.VEL_POR_RONDA),
-					Math.min(GameConfig.VEL_MAX, logica.getVelY() + GameConfig.VEL_POR_RONDA),
-					Math.round(logica.getCantEnemigos() * (1 + GameConfig.CRECIMIENTO_ENEMIGOS)),
-					Math.round(logica.getMaxEnPantalla() * (1 + GameConfig.CRECIMIENTO_MAX_PANTALLA)));
+			GameLogic siguienteLogica = logica.crearSiguienteRonda(texEnemigos, texFlecha, texCargaFuego);
+			Screen ss = new PantallaJuego(
+					game,
+					siguienteLogica.getRonda(),
+					logica.getJugador().getVida(),
+					siguienteLogica.getPuntuacion(),
+					siguienteLogica.getVelX(),
+					siguienteLogica.getVelY(),
+					siguienteLogica.getCantEnemigos(),
+					siguienteLogica.getMaxEnPantalla()
+			);
 			game.setScreen(ss);
 			dispose();
 		}

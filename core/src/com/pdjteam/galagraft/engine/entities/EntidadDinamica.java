@@ -34,6 +34,11 @@ public abstract class EntidadDinamica implements Colisionable {
             this.sprite.setPosition(x, y);
         }
     }
+    
+    // Constructor pensado para entidades no-combatientes como Potenciador y Proyectil
+    protected EntidadDinamica(float x, float y, float velocidadX, float velocidadY, Texture textura) {
+        this(x, y, velocidadX, velocidadY, 0, textura);
+    }
 
     // método abstracto: obliga a las subclases a definir su comportamiento por frame
     public abstract void actualizar(float delta);
@@ -45,6 +50,7 @@ public abstract class EntidadDinamica implements Colisionable {
     }
 
     public void recibirDano(int cantidad) {
+    	if(this.vidaMaxima <= 0) return; // Entidades no-combatientes no gestionan vida
         this.vida -= cantidad;
         if (this.vida <= 0) {
             this.vida = 0;

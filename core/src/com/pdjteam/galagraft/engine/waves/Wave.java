@@ -18,7 +18,6 @@ import com.pdjteam.galagraft.engine.entities.Proyectil;
 
 public class Wave {
 
-    // partes configuradas por el Builder
     private int numeroRonda;
     private int cantEnemigos;
     private int maxEnPantalla;
@@ -31,10 +30,8 @@ public class Wave {
     private Texture[] texEnemigos;
     private Texture texFlecha;
     private Texture texCargaFuego;
-    private List<Proyectil> balas;
 
-    // estado interno y lógica de la formación de la oleada
-    private final ArrayList<Enemigo> enemigosActivos = new ArrayList<>();
+    private final List<Enemigo> enemigosActivos = new ArrayList<>();
     private final Map<Integer, Integer> direccionFila = new HashMap<>();
     private final Random azar = new Random();
     private final int celda;
@@ -75,11 +72,10 @@ public class Wave {
         this.tiposPermitidos = tiposPermitidos;
     }
 
-    public void setRecursos(Texture[] texEnemigos, Texture texFlecha, Texture texCargaFuego, List<Proyectil> balas) {
+    public void setRecursos(Texture[] texEnemigos, Texture texFlecha, Texture texCargaFuego) {
         this.texEnemigos = texEnemigos;
         this.texFlecha = texFlecha;
         this.texCargaFuego = texCargaFuego;
-        this.balas = balas;
     }
 
     public void iniciarOleada() {
@@ -93,6 +89,16 @@ public class Wave {
         for (Enemigo e : enemigosActivos) {
             e.actualizar(delta);
         }
+    }
+
+    public List<Proyectil> recogerProyectilesDisparados() {
+        List<Proyectil> nuevos = new ArrayList<>();
+        for (Enemigo e : enemigosActivos) {
+            if(e.estaActiva()) {
+                nuevos.addAll(e.recogerProyectilesDisparados());
+            }
+        }
+        return nuevos;
     }
 
     private void generarLineas(float delta) {
@@ -138,13 +144,13 @@ public class Wave {
             Enemigo e;
             switch (tipo) {
                 case GameConfig.TIPO_GHAST:
-                    e = new EnemigoGhast(x, y, texEnemigos[tipo], texCargaFuego, balas);
+                    e = new EnemigoGhast(x, y, texEnemigos[tipo], texCargaFuego);
                     break;
                 case GameConfig.TIPO_ESQUELETO:
-                    e = new EnemigoEsqueleto(x, y, texEnemigos[tipo], texFlecha, balas);
+                    e = new EnemigoEsqueleto(x, y, texEnemigos[tipo], texFlecha);
                     break;
                 default:
-                    e = new EnemigoBlaze(x, y, texEnemigos[tipo], texCargaFuego, balas);
+                    e = new EnemigoBlaze(x, y, texEnemigos[tipo], texCargaFuego);
                     break;
             }
 
@@ -155,10 +161,10 @@ public class Wave {
     }
 
     private void moverFormacion() {
-        Map<Integer, ArrayList<Enemigo>> filas = new TreeMap<>();
+        Map<Integer, List<Enemigo>> filas = new TreeMap<>();
         
         for (Enemigo e : enemigosActivos) {
-            ArrayList<Enemigo> grupo = filas.get(e.getFila());
+            List<Enemigo> grupo = filas.get(e.getFila());
             if(grupo == null) {
                 grupo = new ArrayList<>();
                 filas.put(e.getFila(), grupo);
@@ -168,12 +174,12 @@ public class Wave {
         
         direccionFila.keySet().retainAll(filas.keySet());
         
-        for (Map.Entry<Integer, ArrayList<Enemigo>> par : filas.entrySet()) {
+        for (Map.Entry<Integer, List<Enemigo>> par : filas.entrySet()) {
             moverFila(par.getKey(), par.getValue());
         }
     }
 
-    private void moverFila(int fila, ArrayList<Enemigo> enemigos) {
+    private void moverFila(int fila, List<Enemigo> enemigos) {
         float izq = Float.MAX_VALUE;
         float der = -Float.MAX_VALUE;
 
@@ -213,7 +219,7 @@ public class Wave {
         }
     }
 
-    private boolean puedeBajar(int fila, ArrayList<Enemigo> enemigos, int paso) {
+    private boolean puedeBajar(int fila, List<Enemigo> enemigos, int paso) {
         int holgura = GameConfig.ENEMIGO_DISTANCIA_MIN / 2;
         for (Enemigo e : enemigos) {
             Rectangle a = e.getAreaColision();
@@ -246,15 +252,22 @@ public class Wave {
     }
 
     public void eliminarEnemigo(int index) {
-        enemigosActivos.remove(index);
+        if(index >= 0 && index < enemigosActivos.size()) {
+            enemigosActivos.remove(index);
+        }
+    }
+
+    public void eliminarEnemigo(Enemigo enemigo) {
+        enemigosActivos.remove(enemigo);
     }
 
     public boolean estaCompletada() {
         return enemigosActivos.isEmpty() && pendientes <= 0;
     }
 
-    // --- Getters ---
-    public ArrayList<Enemigo> getEnemigosActivos() { return enemigosActivos; }
+    public List<Enemigo> getEnemigosActivos() {
+        return new ArrayList<>(enemigosActivos);
+    }
     public int getNumeroRonda() { return numeroRonda; }
     public int getCantEnemigos() { return cantEnemigos; }
     public int getPendientes() { return pendientes; }

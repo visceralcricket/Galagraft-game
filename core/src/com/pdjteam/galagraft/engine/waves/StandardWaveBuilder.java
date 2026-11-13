@@ -1,60 +1,75 @@
 package com.pdjteam.galagraft.engine.waves;
 
-import java.util.List;
 import com.badlogic.gdx.graphics.Texture;
 import com.pdjteam.galagraft.config.GameConfig;
-import com.pdjteam.galagraft.engine.entities.Proyectil;
 import com.pdjteam.galagraft.interfaces.WaveBuilder;
 
 public class StandardWaveBuilder implements WaveBuilder {
-    private Wave wave;
 
-    public StandardWaveBuilder() { this.reset(); }
-    @Override
-    public void reset() { this.wave = new Wave(); }
+    private Wave oleada;
 
-    @Override
-    public void buildParametrosBase(int ronda, int cantEnemigos, int maxEnPantalla) {
-        this.wave.setNumeroRonda(ronda);
-        this.wave.setCantEnemigos(cantEnemigos);
-        this.wave.setMaxEnPantalla(maxEnPantalla);
-        this.wave.setIntervaloSpawnMs(GameConfig.INTERVALO_LINEA_MS);
+    public StandardWaveBuilder() {
+        this.reset();
     }
 
     @Override
-    public void buildComposicionEnemigos(int ronda) {
-        if(ronda == 1) {
-            // en la ronda 1 aparecen esqueletos y blazes -> a partir de la 2 se incluyen ghasts
-            this.wave.setTiposPermitidos(new int[] {
-                GameConfig.TIPO_ESQUELETO,
-                GameConfig.TIPO_BLAZE
-            });
-        }
-        else {
-            this.wave.setTiposPermitidos(new int[] {
-                GameConfig.TIPO_GHAST,
-                GameConfig.TIPO_ESQUELETO,
-                GameConfig.TIPO_BLAZE
-            });
-        }
+    public void reset() {
+        this.oleada = new Wave();
+    }
+
+    @Override
+    public void buildParametrosRonda(int numeroRonda, int cantEnemigos, int maxEnPantalla) {
+        oleada.setNumeroRonda(numeroRonda);
+        oleada.setCantEnemigos(cantEnemigos);
+        oleada.setMaxEnPantalla(maxEnPantalla);
     }
 
     @Override
     public void buildVelocidades(int velX, int velY) {
-        int vx = Math.min(GameConfig.VEL_MAX, velX);
-        int vy = Math.min(GameConfig.VEL_MAX, velY);
-        this.wave.setVelocidades(vx, vy);
+        oleada.setVelocidades(velX, velY);
     }
 
     @Override
-    public void buildRecursos(Texture[] texEnemigos, Texture texFlecha, Texture texCargaFuego, List<Proyectil> balas) {
-        this.wave.setRecursos(texEnemigos, texFlecha, texCargaFuego, balas);
+    public void buildCadenciaAparicion(int numeroRonda) {
+        float reduccion = Math.max(0, numeroRonda - 1) * 150f;
+        float intervalo = Math.max(1200f, GameConfig.INTERVALO_LINEA_MS - reduccion);
+        oleada.setIntervaloSpawnMs(intervalo);
     }
 
     @Override
-    public Wave getResult() {
-        Wave resultado = this.wave;
+    public void buildComposicionEnemigos(int numeroRonda) {
+        if (numeroRonda == 1) {
+            oleada.setTiposPermitidos(new int[]{
+                    GameConfig.TIPO_ESQUELETO,
+                    GameConfig.TIPO_ESQUELETO,
+                    GameConfig.TIPO_BLAZE
+            });
+        } else if (numeroRonda == 2) {
+            oleada.setTiposPermitidos(new int[]{
+                    GameConfig.TIPO_ESQUELETO,
+                    GameConfig.TIPO_BLAZE,
+                    GameConfig.TIPO_GHAST
+            });
+        } else {
+            oleada.setTiposPermitidos(new int[]{
+                    GameConfig.TIPO_ESQUELETO,
+                    GameConfig.TIPO_BLAZE,
+                    GameConfig.TIPO_BLAZE,
+                    GameConfig.TIPO_GHAST,
+                    GameConfig.TIPO_GHAST
+            });
+        }
+    }
+
+    @Override
+    public void buildRecursos(Texture[] texEnemigos, Texture texFlecha, Texture texCargaFuego) {
+        oleada.setRecursos(texEnemigos, texFlecha, texCargaFuego);
+    }
+
+    @Override
+    public Wave getResultado() {
+        Wave producto = this.oleada;
         this.reset();
-        return resultado;
+        return producto;
     }
 }
