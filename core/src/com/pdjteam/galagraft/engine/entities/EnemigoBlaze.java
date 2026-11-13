@@ -7,7 +7,7 @@ import com.pdjteam.galagraft.config.GameConfig;
 public class EnemigoBlaze extends Enemigo {
 
     public EnemigoBlaze(float x, float y, Texture texBlaze, Texture texCargaFuego) {
-        super(x, y, 160f, -25f, 3, GameConfig.INTERVALO_DISPARO_BLAZE, 250, texBlaze, texCargaFuego);
+        super(x, y, 160f, -25f, 2, GameConfig.INTERVALO_DISPARO_BLAZE, 250, texBlaze, texCargaFuego);
     }
 
     @Override

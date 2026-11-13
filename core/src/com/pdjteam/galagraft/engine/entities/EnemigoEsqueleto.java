@@ -6,7 +6,7 @@ import com.pdjteam.galagraft.config.GameConfig;
 public class EnemigoEsqueleto extends Enemigo {
 
 	public EnemigoEsqueleto(float x, float y, Texture texEsqueleto, Texture texFlecha) {
-        super(x, y, 120f, -15f, 2, GameConfig.INTERVALO_DISPARO_ESQUELETO, 100, texEsqueleto, texFlecha);
+        super(x, y, 120f, -15f, 1, GameConfig.INTERVALO_DISPARO_ESQUELETO, 100, texEsqueleto, texFlecha);
     }
 
     @Override

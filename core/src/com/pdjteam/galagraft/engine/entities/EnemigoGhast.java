@@ -9,7 +9,7 @@ import com.pdjteam.galagraft.config.GameConfig;
 public class EnemigoGhast extends Enemigo {
 
 	public EnemigoGhast(float x, float y, Texture texGhast, Texture texCargaFuego) {
-        super(x, y, 100f, -10f, 4, GameConfig.INTERVALO_DISPARO_GHAST, 400, texGhast, texCargaFuego);
+        super(x, y, 100f, -10f, 3, GameConfig.INTERVALO_DISPARO_GHAST, 400, texGhast, texCargaFuego);
     }
 
     @Override
