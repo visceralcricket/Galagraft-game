@@ -6,6 +6,8 @@ import java.util.Random;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 
 import com.pdjteam.galagraft.engine.entities.Enemigo;
 import com.pdjteam.galagraft.engine.entities.Potenciador;
@@ -25,6 +27,7 @@ public class GameLogic {
     private final List<Potenciador> potenciadores = new ArrayList<>();
     private final CatalogoPotenciadores catalogoPotenciadores;
     private final Random azar = new Random();
+    private Sound sndEnemigoHerido;
 
     private int puntuacion;
 
@@ -38,11 +41,13 @@ public class GameLogic {
             Texture[] texEnemigos,
             Texture texFlecha,
             Texture texCargaFuego,
-            CatalogoPotenciadores catalogoPotenciadores) {
+            CatalogoPotenciadores catalogoPotenciadores,
+            Sound sndEnemigoHerido) {
 
         // GM-6: obtener instancia de jugador Shulker
         this.jugador = Shulker.getInstancia();
         this.puntuacion = puntuacion;
+        this.sndEnemigoHerido = sndEnemigoHerido;
         this.catalogoPotenciadores = catalogoPotenciadores;
 
         // GM-9: construcción de la oleada mediante el patrón Builder
@@ -138,6 +143,7 @@ public class GameLogic {
                         jugador.agregarPuntaje(GameConfig.PUNTOS_POR_ENEMIGO);
                         destruidos++;
                     }
+                    else if(sndEnemigoHerido != null) sndEnemigoHerido.play();
                     if (!p.estaActiva()) {
                         balas.remove(i);
                     }
@@ -185,7 +191,8 @@ public class GameLogic {
                 texEnemigos,
                 texFlecha,
                 texCargaFuego,
-                this.catalogoPotenciadores
+                this.catalogoPotenciadores,
+                sndEnemigoHerido
         );
     }
 

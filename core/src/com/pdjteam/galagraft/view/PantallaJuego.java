@@ -41,6 +41,7 @@ public class PantallaJuego implements Screen {
 	private Sound sndDano;
 	private Sound sndDisparo;
 	private Sound sndDisparoJ;
+	private Sound sndEnemigoHerido;
 	private boolean pausado = false;
 	private boolean recursosLiberados = false;
 
@@ -71,6 +72,7 @@ public class PantallaJuego implements Screen {
 		sndDano = Gdx.audio.newSound(Gdx.files.internal(GameConfig.SND_DANO));
 		sndDisparo = Gdx.audio.newSound(Gdx.files.internal(GameConfig.SND_DISPARO));
 		sndDisparoJ = Gdx.audio.newSound(Gdx.files.internal(GameConfig.SND_DISPARO_J));
+		sndEnemigoHerido = Gdx.audio.newSound(Gdx.files.internal(GameConfig.SND_ENEMIGO_HERIDO));
 		
 		Shulker jugador = Shulker.inicializarInstancia(
 				GameConfig.ANCHO_MUNDO / 2f - 32f, 
@@ -95,7 +97,8 @@ public class PantallaJuego implements Screen {
 				texEnemigos,
 				texFlecha,
 				texCargaFuego,
-				catalogoPotenciadores
+				catalogoPotenciadores,
+				sndEnemigoHerido
 		);
 	}
     
@@ -119,10 +122,6 @@ public class PantallaJuego implements Screen {
 			pausado = !pausado;
 			if(pausado) gameMusic.pause();
 			else gameMusic.play();
-		}
-
-		if(Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-			logica.getJugador().activarPotenciador(new DisparoTriplePowerUpStrategy());
 		}
 
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -228,6 +227,7 @@ public class PantallaJuego implements Screen {
 		sndDano.dispose();
 		sndDisparo.dispose();
 		sndDisparoJ.dispose();
+		sndEnemigoHerido.dispose();
 		fondo.dispose();
 	}
 }
