@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.Align;
 import com.pdjteam.galagraft.Galagraft;
 import com.pdjteam.galagraft.config.*;
@@ -14,14 +16,18 @@ import com.pdjteam.galagraft.config.*;
 public class PantallaMenu implements Screen {
 
 	private Galagraft game;
-	private FitViewport viewport;
+	private StretchViewport viewport;
 	private OrthographicCamera camera;
+	private Texture fondo;
+	private SpriteBatch batch;
 
 	public PantallaMenu(Galagraft game) {
 		this.game = game;
+		this.batch = game.getBatch();
         
 		camera = new OrthographicCamera();
-		viewport = new FitViewport(GameConfig.ANCHO_MUNDO, GameConfig.ALTO_MUNDO, camera);
+		viewport = new StretchViewport(GameConfig.ANCHO_MUNDO, GameConfig.ALTO_MUNDO, camera);
+		fondo = new Texture(Gdx.files.internal(GameConfig.WPR_MENU));
 	}
 
 	@Override
@@ -38,6 +44,11 @@ public class PantallaMenu implements Screen {
 		game.getBatch().setProjectionMatrix(camera.combined);
 
 		game.getBatch().begin();
+		
+		batch.setColor(1f, 1f, 1f, 0.5f); 
+		game.getBatch().draw(fondo, 0, 0, GameConfig.ANCHO_MUNDO, GameConfig.ALTO_MUNDO);
+		batch.setColor(1f, 1f, 1f, 1f); 
+		
 		game.getFont().draw(game.getBatch(), "Bienvenido a Galagraft !", 0, GameConfig.ALTO_MUNDO / 2, GameConfig.ANCHO_MUNDO, Align.center, false);
 		game.getFont().draw(game.getBatch(), "Presiona en cualquier lado o presiona cualquier tecla para comenzar ...", 0, GameConfig.ALTO_MUNDO / 2 - 100, GameConfig.ANCHO_MUNDO, Align.center, false);
 	
@@ -69,6 +80,8 @@ public class PantallaMenu implements Screen {
 	public void hide() { }
 
 	@Override
-	public void dispose() { }
+	public void dispose() {
+		fondo.dispose();
+	}
    
 }

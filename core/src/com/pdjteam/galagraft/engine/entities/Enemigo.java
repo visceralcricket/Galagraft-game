@@ -1,10 +1,9 @@
 package com.pdjteam.galagraft.engine.entities;
 
+import java.util.ArrayList;
 import java.util.List;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-
-// interfaz
+import com.badlogic.gdx.math.MathUtils;
 import com.pdjteam.galagraft.interfaces.Colisionable;
 
 public abstract class Enemigo extends EntidadDinamica {
@@ -12,40 +11,32 @@ public abstract class Enemigo extends EntidadDinamica {
     private float intervaloDisparo;
     private int puntajeOtorgado;
     private Texture texturaProyectil;
-    private List<Proyectil> listaProyectilesJuego;
+    private final List<Proyectil> proyectilesRecienDisparados = new ArrayList<>();
+    private int fila;
 
     public Enemigo(float x, float y, float vx, float vy, int vidaMaxima, float intervaloDisparo, 
-                   int puntaje, Texture texturaEnemigo, Texture texturaProyectil, List<Proyectil> proyectiles) {
+                   int puntaje, Texture texturaEnemigo, Texture texturaProyectil) {
         super(x, y, vx, vy, vidaMaxima, texturaEnemigo);
-        this.tiempoDesdeUltimoDisparo = 0f;
+        this.tiempoDesdeUltimoDisparo = MathUtils.random(0f, intervaloDisparo);
         this.intervaloDisparo = intervaloDisparo;
         this.puntajeOtorgado = puntaje;
         this.texturaProyectil = texturaProyectil;
-        this.listaProyectilesJuego = proyectiles;
     }
 
     /**
-     * TEMPLATE METHOD (GM 8): Plantilla invariante del ciclo de vida de un enemigo en cada frame.
-     * Es 'final' para evitar que las subclases modifiquen el orden de ejecución.
+     * TEMPLATE METHOD (GM 8): Plantilla invariante del ciclo de vida de un enemigo en cada frame
      */
     @Override
     public final void actualizar(float delta) {
         if(!estaActiva()) return;
 
-        // actualizar cooldowns
         actualizarTemporizadores(delta);
-
-        // cada mob se mueve distinto
         ejecutarMovimiento(delta);
 
-        // rebotar en bordes laterales
-        verificarLimitesPantalla();
-
-        // gancho + operación abstracta de ataque
         if(puedeAtacar()) {
             Proyectil nuevoDisparo = crearProyectilAtaque();
-            if(nuevoDisparo != null && this.listaProyectilesJuego != null) {
-                this.listaProyectilesJuego.add(nuevoDisparo);
+            if(nuevoDisparo != null) {
+                this.proyectilesRecienDisparados.add(nuevoDisparo);
             }
             reiniciarTemporizadorDisparo();
         }
@@ -57,22 +48,6 @@ public abstract class Enemigo extends EntidadDinamica {
         this.tiempoDesdeUltimoDisparo += delta;
     }
 
-    protected void verificarLimitesPantalla() {
-        float anchoSprite = getSprite() != null ? getSprite().getWidth() : 32f;
-        if(getX() <= 0) {
-            setX(0);
-            setVelocidadX(Math.abs(getVelocidadX()));
-        }
-        else if(getX() + anchoSprite >= Gdx.graphics.getWidth()) {
-            setX(Gdx.graphics.getWidth() - anchoSprite);
-            setVelocidadX(-Math.abs(getVelocidadX()));
-        }
-
-        if(getY() < -anchoSprite) {
-            setActiva(false);
-        }
-    }
-
     protected boolean puedeAtacar() {
         return this.tiempoDesdeUltimoDisparo >= this.intervaloDisparo;
     }
@@ -81,29 +56,41 @@ public abstract class Enemigo extends EntidadDinamica {
         this.tiempoDesdeUltimoDisparo = 0f;
     }
 
-    // Operaciones  abstractas que deben implementar Esqueleto, Blaze y Ghast
-    protected abstract void ejecutarMovimiento(float delta);
+    protected void ejecutarMovimiento(float delta) { }
+
     protected abstract Proyectil crearProyectilAtaque();
 
     @Override
     public void alColisionar(Colisionable otro) {
-        if(otro instanceof Proyectil) {
-            Proyectil p = (Proyectil) otro;
-            if(p.isEsDelJugador()) {
-                recibirDano(p.getDano());
-            }
+        if (!estaActiva() || otro == null || !otro.estaActiva()) return;
+        otro.recibirColisionDeEnemigo(this);
+    }
+
+    @Override
+    public void recibirColisionDeProyectil(Proyectil proyectil) {
+        if (proyectil.isEsDelJugador()) {
+            this.recibirDano(1);
+            proyectil.setActiva(false);
         }
     }
-    
-    private int fila;
 
-    public int getFila() {
-        return fila;
+    @Override
+    public void recibirColisionDeJugador(Shulker jugador) {
+        jugador.recibirColisionDeEnemigo(this);
     }
 
-    public void setFila(int fila) {
-        this.fila = fila;
+    public List<Proyectil> recogerProyectilesDisparados() {
+        List<Proyectil> copia = new ArrayList<>(this.proyectilesRecienDisparados);
+        this.proyectilesRecienDisparados.clear();
+        return copia;
     }
+
+    public List<Proyectil> getListaProyectilesJuego() {
+        return new ArrayList<>(this.proyectilesRecienDisparados);
+    }
+
+    public int getFila() { return fila; }
+    public void setFila(int fila) { this.fila = fila; }
 
     public void mover(float dx, float dy) {
         setX(getX() + dx);
@@ -115,7 +102,6 @@ public abstract class Enemigo extends EntidadDinamica {
         setY(getY() + dy);
     }
 
-    // Getters y Setters
     public float getTiempoDesdeUltimoDisparo() { return tiempoDesdeUltimoDisparo; }
     public void setTiempoDesdeUltimoDisparo(float t) { this.tiempoDesdeUltimoDisparo = t; }
     public float getIntervaloDisparo() { return intervaloDisparo; }
@@ -124,6 +110,4 @@ public abstract class Enemigo extends EntidadDinamica {
     public void setPuntajeOtorgado(int puntaje) { this.puntajeOtorgado = puntaje; }
     public Texture getTexturaProyectil() { return texturaProyectil; }
     public void setTexturaProyectil(Texture texturaProyectil) { this.texturaProyectil = texturaProyectil; }
-    public List<Proyectil> getListaProyectilesJuego() { return listaProyectilesJuego; }
-    public void setListaProyectilesJuego(List<Proyectil> lista) { this.listaProyectilesJuego = lista; }
 }

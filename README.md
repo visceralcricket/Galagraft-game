@@ -1,7 +1,7 @@
 # **Galagraft**
 > *Videojuego arcade tipo Galaga con temática Minecraft, desarrollado en Java con el motor LibGDX.*
 
-<img src="https://img.shields.io/badge/version-1.0.0-blue" alt="version"> [![Last Commit](https://img.shields.io/github/last-commit/visceralcricket/Galagraft-game/main)](https://github.com/visceralcricket/Galagraft-game/tree/main)
+<img src="https://img.shields.io/badge/version-1.1.0-blue" alt="version"> [![Last Commit](https://img.shields.io/github/last-commit/visceralcricket/Galagraft-game/main)](https://github.com/visceralcricket/Galagraft-game/tree/main)
 
 ## **Premisa**
 * **"Galagraft"** es un videojuego estilo *shoot 'em up* arcade fuertemente inspirado en Galaga donde el jugador controla a un Shulker. El objetivo es defender tu End City destruyendo oleadas de enemigos (mobs de Minecraft) que bajan por la pantalla para avanzar de ronda. Cada ronda aumenta la velocidad y la cantidad de enemigos.
@@ -42,8 +42,12 @@ gradlew.bat desktop:run
     * <code><b><span style="color: #f43009da;">Galagraft.java</span></b></code>: Clase orquestadora principal (extiende `Game`).
     * <code><b><span style="color: #009dff;">config/</span></b></code>: Configuraciones generales y constantes.
     * <code><b><span style="color: #009dff;">engine/entities/</span></b></code>: Clases del modelo del juego (EntidadDinamica, Shulker, Enemigos, Proyectiles).
+    * <code><b><span style="color: #009dff;">engine/waves/</span></b></code>: Construcción y gestión de oleadas de enemigos aplicando patrón Builder (`Wave`, `StandardWaveBuilder`, `WaveDirector`).
+    * <code><b><span style="color: #009dff;">engine/powerups/</span></b></code>: Catálogo y generación de potenciadores (`CatalogoPotenciadores`).
+    * <code><b><span style="color: #009dff;">interfaces/</span></b></code>: Contratos del dominio (`Colisionable`, `WaveBuilder`).
     * <code><b><span style="color: #009dff;">strategies/</span></b></code>: Lógica de disparos y power-ups aplicando patrón Strategy.
     * <code><b><span style="color: #009dff;">view/</span></b></code>: Todo lo relacionado a las pantallas (Menú, Juego, GameOver).
+    
 
 * <code><b><span style="color: #23c523d4;">desktop/src/</span></b></code>: Punto de entrada para escritorio (LWJGL3).
 * <code><b><span style="color: #23c523d4;">assets/</span></b></code>: Texturas, sprites, efectos de sonido y música de fondo.
@@ -57,7 +61,7 @@ gradlew.bat desktop:run
 + GM-6: Patrón Singleton implementado en el Shulker (jugador único).
 + GM-7: Patrón Strategy aplicado en los tipos de disparo (DisparoSimple, DisparoTriple).
 + GM-8: Patrón Template Method en la clase Enemigo para definir el ciclo de actualización base.
-- GM-9 [PENDIENTE]: Patrón Builder diseñado para ser utilizado en la instanciación de las rondas/oleadas de enemigos.
++ GM-9: Patrón Builder implementado (WaveBuilder, StandardWaveBuilder, WaveDirector y Wave) para la construcción de oleadas.
 + GM-10: Uso extensivo de Github con ramas y múltiples commits.
 ```
 
@@ -69,6 +73,21 @@ gradlew.bat desktop:run
 
 # **Changelog - Galagraft**
 <small>*Nota: Este changelog utiliza fechas en ISO estándar: YY-MM-DD.*</small>
+
+## [1.1.0] - 2026-11-13
+> Versión de cierre y refactorización arquitectónica (pago de deuda técnica y cumplimiento total de requerimientos GM).
+
+### Añadido
++ Implementado el patrón de diseño **Builder** (`WaveBuilder`, `StandardWaveBuilder`, `WaveDirector` y producto `Wave`) para la construcción escalonada de oleadas por ronda (GM-9).
++ Ataques específicos por tipo de enemigo mediante **Template Method** (`EnemigoEsqueleto`, `EnemigoBlaze` con disparo dirigido al jugador y `EnemigoGhast`).
++ Nuevo efecto de sonido al impactar enemigos con proyectiles del jugador y nuevo fondo visual en el menú principal (`PantallaMenu`).
++ Añadidos paquetes `engine/waves/`, `engine/powerups/` (`CatalogoPotenciadores`) e `interfaces/`.
+
+### Cambios y Refactorizaciones
++ **Polimorfismo y Double Dispatch:** refactorizada la jerarquía de `EntidadDinamica` (incluyendo `Proyectil` y `Potenciador`) y la interfaz `Colisionable` para resolver todas las colisiones polimórficamente sin uso de `instanceof` (GM-4 / GM-5).
++ **Encapsulamiento y Copias Defensivas:** eliminado el traspaso de colecciones mutables por parámetro; los métodos de consulta ahora retornan copias defensivas tipadas bajo la interfaz `List`.
++ **Desacoplamiento Modelo-Vista y Singleton:** extraída la progresión matemática de rondas y colisiones restantes desde `PantallaJuego` hacia `GameLogic`, y unificado el acceso global mediante `Shulker.getInstancia()` sin paso por parámetro (GM-2 / GM-6).
++ Balanceados los puntos de salud de los enemigos y eliminado el atajo de prueba de la tecla `E` para activar el disparo triple.
 
 ## [1.0.0] - 2026-10-25
 > Versión funcional con la mayoría de requerimientos del proyecto y mejoras QoL implementados.

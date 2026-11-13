@@ -33,7 +33,8 @@ public class Shulker extends EntidadDinamica {
     private Sound sonidoDisparo;
     private Sound sonidoDisparoJ;
     private Sound sonidoHurt;
-    private List<Proyectil> proyectilesJuego;
+    private final List<Proyectil> proyectilesRecienDisparados = new ArrayList<>();
+    private int balasActivasEnMundo = 0;
 
     // Un potenciador temporal en curso: su estrategia y los segundos que le quedan
     private static class EfectoActivo {
@@ -47,7 +48,7 @@ public class Shulker extends EntidadDinamica {
     }
 
     private Shulker(float x, float y, Texture texturaJugador, Texture texturaBala, 
-                    Sound sonidoDisparo, Sound sonidoDisparoJ, Sound sonidoHurt, List<Proyectil> proyectiles) {
+                    Sound sonidoDisparo, Sound sonidoDisparoJ, Sound sonidoHurt) {
         super(x, y, 500f, 0f, GameConfig.VIDAS_INICIALES, texturaJugador);
         this.puntaje = 0;
         this.tiempoDesdeUltimoDisparo = 0f;
@@ -56,7 +57,6 @@ public class Shulker extends EntidadDinamica {
         this.sonidoDisparo = sonidoDisparo;
         this.sonidoDisparoJ = sonidoDisparoJ;
         this.sonidoHurt = sonidoHurt;
-        this.proyectilesJuego = proyectiles;
 
         if(getSprite() != null) {
             getSprite().setSize(TAMANO_SHULKER, TAMANO_SHULKER);
@@ -65,12 +65,12 @@ public class Shulker extends EntidadDinamica {
     }
 
     public static Shulker inicializarInstancia(float x, float y, Texture texJugador, Texture texBala,
-                                               Sound sDisparo, Sound sDisparoJ, Sound sHurt, List<Proyectil> proyectiles) {
+                                               Sound sDisparo, Sound sDisparoJ, Sound sHurt) {
         if(instancia == null) {
-            instancia = new Shulker(x, y, texJugador, texBala, sDisparo, sDisparoJ, sHurt, proyectiles);
+            instancia = new Shulker(x, y, texJugador, texBala, sDisparo, sDisparoJ, sHurt);
         }
         else {
-            instancia.reiniciarEstado(x, y, texJugador, texBala, sDisparo, sDisparoJ, sHurt, proyectiles);
+            instancia.reiniciarEstado(x, y, texJugador, texBala, sDisparo, sDisparoJ, sHurt);
         }
         return instancia;
     }
@@ -80,12 +80,11 @@ public class Shulker extends EntidadDinamica {
     }
 
     public void reiniciarEstado(float x, float y, Texture texJugador, Texture texBala,
-                                Sound sDisparo, Sound sDisparoJ, Sound sHurt, List<Proyectil> proyectiles) {
+                                Sound sDisparo, Sound sDisparoJ, Sound sHurt) {
         this.texturaBala = texBala;
         this.sonidoDisparo = sDisparo;
         this.sonidoDisparoJ = sDisparoJ;
         this.sonidoHurt = sHurt;
-        this.proyectilesJuego = proyectiles;
         this.tiempoDesdeUltimoDisparo = 0f;
         // los potenciadores no pasan de una ronda a otra: se revierten sus efectos
         revertirEfectosActivos();
@@ -112,14 +111,13 @@ public class Shulker extends EntidadDinamica {
         for(int i = efectosActivos.size() - 1; i >= 0; i--) {
             EfectoActivo activo = efectosActivos.get(i);
             if(activo.estrategia.getCategoria().equals(nuevo.getCategoria())) {
-                activo.estrategia.revertir(this);
+                activo.estrategia.revertir();
                 efectosActivos.remove(i);
             }
         }
 
-        nuevo.aplicar(this);
+        nuevo.aplicar();
 
-        // duración 0 = efecto instantáneo (p. ej. vida extra): no hay nada que revertir después
         if(nuevo.getDuracion() > 0) {
             efectosActivos.add(new EfectoActivo(nuevo, nuevo.getDuracion()));
         }
@@ -130,7 +128,7 @@ public class Shulker extends EntidadDinamica {
             EfectoActivo activo = efectosActivos.get(i);
             activo.restante -= delta;
             if(activo.restante <= 0) {
-                activo.estrategia.revertir(this);
+                activo.estrategia.revertir();
                 efectosActivos.remove(i);
             }
         }
@@ -138,7 +136,7 @@ public class Shulker extends EntidadDinamica {
 
     private void revertirEfectosActivos() {
         for(EfectoActivo activo : efectosActivos) {
-            activo.estrategia.revertir(this);
+            activo.estrategia.revertir();
         }
         efectosActivos.clear();
     }
@@ -148,15 +146,16 @@ public class Shulker extends EntidadDinamica {
      * y se ignora mientras hay un potenciador de disparo activo.
      */
     public boolean hayCupoDeBalas() {
-        for(EfectoActivo activo : efectosActivos) {
-            if(EstrategiaPotenciador.CATEGORIA_DISPARO.equals(activo.estrategia.getCategoria())) return true;
+        for (EfectoActivo activo : efectosActivos) {
+            if (EstrategiaPotenciador.CATEGORIA_DISPARO.equals(activo.estrategia.getCategoria())) {
+                return true;
+            }
         }
+        return this.balasActivasEnMundo < GameConfig.MAX_BALAS;
+    }
 
-        int balasJugador = 0;
-        for(Proyectil p : this.proyectilesJuego) {
-            if(p.isEsDelJugador()) balasJugador++;
-        }
-        return balasJugador < GameConfig.MAX_BALAS;
+    public void setBalasActivasEnMundo(int cantidad) {
+        this.balasActivasEnMundo = Math.max(0, cantidad);
     }
 
     @Override
@@ -184,8 +183,9 @@ public class Shulker extends EntidadDinamica {
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE) && 
             this.tiempoDesdeUltimoDisparo >= this.estrategiaDisparo.getTiempoEnfriamiento() &&
             hayCupoDeBalas()) {
-
-            this.estrategiaDisparo.ejecutarDisparo(this, this.proyectilesJuego, this.texturaBala);
+        	
+        	List<Proyectil> generados = this.estrategiaDisparo.ejecutarDisparo(this.texturaBala);
+        	this.proyectilesRecienDisparados.addAll(generados);
 
             if(MathUtils.random() < GameConfig.PROB_DISPARO_J) {
                 if(this.sonidoDisparoJ != null) this.sonidoDisparoJ.play();
@@ -202,16 +202,34 @@ public class Shulker extends EntidadDinamica {
 
     @Override
     public void alColisionar(Colisionable otro) {
-        if(otro instanceof Proyectil) {
-            Proyectil p = (Proyectil) otro;
-            if(!p.isEsDelJugador()) {
-                recibirDano(p.getDano());
-                if(this.sonidoHurt != null) this.sonidoHurt.play();
-            }
+        if (!estaActiva() || otro == null || !otro.estaActiva()) return;
+        otro.recibirColisionDeJugador(this);
+    }
+
+    @Override
+    public void recibirColisionDeEnemigo(Enemigo enemigo) {
+        this.recibirDano(1);
+        if (this.sonidoHurt != null) {
+            this.sonidoHurt.play();
         }
-        else if(otro instanceof Enemigo) {
-            recibirDano(1);
-            if(this.sonidoHurt != null) this.sonidoHurt.play();
+        enemigo.setActiva(false);
+    }
+
+    @Override
+    public void recibirColisionDeProyectil(Proyectil proyectil) {
+        if (!proyectil.isEsDelJugador()) {
+            this.recibirDano(1);
+            if (this.sonidoHurt != null) {
+                this.sonidoHurt.play();
+            }
+            proyectil.setActiva(false);
+        }
+    }
+
+    @Override
+    public void recibirColisionDePotenciador(Potenciador potenciador) {
+        if (potenciador.estaActiva()) {
+            potenciador.recoger();
         }
     }
 
@@ -237,6 +255,13 @@ public class Shulker extends EntidadDinamica {
     public Sound getSonidoHurt() { return sonidoHurt; }
     public void setSonidoHurt(Sound sonidoHurt) { this.sonidoHurt = sonidoHurt; }
     
-    public List<Proyectil> getProyectilesJuego() { return proyectilesJuego; }
-    public void setProyectilesJuego(List<Proyectil> proyectiles) { this.proyectilesJuego = proyectiles; }
+    public List<Proyectil> recogerProyectilesDisparados() {
+        List<Proyectil> copia = new ArrayList<>(this.proyectilesRecienDisparados);
+        this.proyectilesRecienDisparados.clear();
+        return copia;
+    }
+
+    public List<Proyectil> getProyectilesJuego() {
+        return new ArrayList<>(this.proyectilesRecienDisparados);
+    }
 }
