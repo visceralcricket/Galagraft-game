@@ -83,8 +83,7 @@ public class PantallaJuego implements Screen {
 				texBala, 
 				sndDisparo,
 				sndDisparoJ, 
-				sndDano, 
-				proyectiles
+				sndDano // borrada variable 'proyectiles'
 		);
 		jugador.setVidaMaxima(Math.max(vidas, GameConfig.VIDAS_INICIALES));
 		jugador.setVida(vidas);

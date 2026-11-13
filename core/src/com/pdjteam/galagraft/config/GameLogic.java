@@ -7,14 +7,11 @@ import java.util.Random;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Rectangle;
 
-// Entidades clave
 import com.pdjteam.galagraft.engine.entities.Enemigo;
 import com.pdjteam.galagraft.engine.entities.Potenciador;
 import com.pdjteam.galagraft.engine.entities.Proyectil;
 import com.pdjteam.galagraft.engine.entities.Shulker;
-
 import com.pdjteam.galagraft.engine.powerups.CatalogoPotenciadores;
-
 import com.pdjteam.galagraft.engine.waves.StandardWaveBuilder;
 import com.pdjteam.galagraft.engine.waves.Wave;
 import com.pdjteam.galagraft.engine.waves.WaveDirector;
@@ -24,7 +21,7 @@ public class GameLogic {
 
     private final Shulker jugador;
     private final Wave oleadaActual;
-    private final List<Proyectil> balas;
+    private final List<Proyectil> balas = new ArrayList<>();
     private final List<Potenciador> potenciadores = new ArrayList<>();
     private final CatalogoPotenciadores catalogoPotenciadores;
     private final Random azar = new Random();
@@ -32,7 +29,6 @@ public class GameLogic {
     private int puntuacion;
 
     public GameLogic(
-            Shulker jugador,
             int ronda,
             int puntuacion,
             int velX,
@@ -44,13 +40,12 @@ public class GameLogic {
             Texture texCargaFuego,
             CatalogoPotenciadores catalogoPotenciadores) {
 
-    	// obtener instancia de Shulker
+        // GM-6: obtener instancia de jugador Shulker
         this.jugador = Shulker.getInstancia();
         this.puntuacion = puntuacion;
         this.catalogoPotenciadores = catalogoPotenciadores;
-        this.balas = jugador.getProyectilesJuego();
 
-        // patrón Builder (GM-9)
+        // GM-9: construcción de la oleada mediante el patrón Builder
         WaveBuilder builder = new StandardWaveBuilder();
         WaveDirector director = new WaveDirector(builder);
         this.oleadaActual = director.construirOleada(
@@ -61,8 +56,7 @@ public class GameLogic {
                 velY,
                 texEnemigos,
                 texFlecha,
-                texCargaFuego,
-                this.balas
+                texCargaFuego
         );
         this.oleadaActual.iniciarOleada();
     }
@@ -91,14 +85,32 @@ public class GameLogic {
         }
     }
 
+    private void sincronizarCupoBalasJugador() {
+        int activasJugador = 0;
+        for (Proyectil p : balas) {
+            if (p.estaActiva() && p.isEsDelJugador()) {
+                activasJugador++;
+            }
+        }
+        jugador.setBalasActivasEnMundo(activasJugador);
+    }
+
     public int actualizar(float delta) {
         int destruidos = 0;
         if(!jugador.estaActiva()) {
             return 0;
         }
 
-        ArrayList<Enemigo> enemigos = oleadaActual.getEnemigosActivos();
+        // sincronizar conteo de balas para hayCupoDeBalas() y recolectar nuevos disparos del Shulker
+        sincronizarCupoBalasJugador();
+        balas.addAll(jugador.recogerProyectilesDisparados());
+        
+        oleadaActual.actualizar(delta);
+        balas.addAll(oleadaActual.recogerProyectilesDisparados());
 
+        List<Enemigo> enemigos = oleadaActual.getEnemigosActivos();
+
+        // colisiones de proyectiles (GM-4 y GM-5: polimorfismo sin instanceof)
         for (int i = balas.size() - 1; i >= 0; i--) {
             Proyectil p = balas.get(i);
             p.actualizar(delta);
@@ -108,19 +120,19 @@ public class GameLogic {
             }
             if(!p.isEsDelJugador()) {
                 if(p.verificarColision(jugador)) {
-                    jugador.alColisionar(p);
                     p.alColisionar(jugador);
-                    balas.remove(i);
+                    if (!p.estaActiva()) {
+                        balas.remove(i);
+                    }
                 }
                 continue;
             }
             for (int j = enemigos.size() - 1; j >= 0; j--) {
                 Enemigo enemigo = enemigos.get(j);
-                if(p.verificarColision(enemigo)) {
+                if(enemigo.estaActiva() && p.verificarColision(enemigo)) {
                     p.alColisionar(enemigo);
-                    enemigo.alColisionar(p);
                     if(!enemigo.estaActiva()) {
-                        oleadaActual.eliminarEnemigo(j);
+                        oleadaActual.eliminarEnemigo(enemigo);
                         soltarPotenciador(enemigo);
                         puntuacion += GameConfig.PUNTOS_POR_ENEMIGO;
                         jugador.agregarPuntaje(GameConfig.PUNTOS_POR_ENEMIGO);
@@ -134,9 +146,44 @@ public class GameLogic {
             }
         }
 
+        List<Enemigo> enemigosRestantes = oleadaActual.getEnemigosActivos();
+        for (int i = enemigosRestantes.size() - 1; i >= 0; i--) {
+            Enemigo e = enemigosRestantes.get(i);
+            if (e.estaActiva() && jugador.verificarColision(e)) {
+                jugador.alColisionar(e);
+                if (!e.estaActiva()) {
+                    oleadaActual.eliminarEnemigo(e);
+                }
+            }
+        }
+
         actualizarPotenciadores(delta);
-        oleadaActual.actualizar(delta);
+        sincronizarCupoBalasJugador();
         return destruidos;
+    }
+
+    public GameLogic crearSiguienteRonda(
+            Texture[] texEnemigos,
+            Texture texFlecha,
+            Texture texCargaFuego) {
+
+        int nuevaRonda = getRonda() + 1;
+        int nuevaVel = Math.min(getVelX() + GameConfig.VEL_POR_RONDA, GameConfig.VEL_MAX);
+        int nuevosEnemigos = Math.round(getCantEnemigos() * (1 + GameConfig.CRECIMIENTO_ENEMIGOS));
+        int nuevoMaxPantalla = Math.round(getMaxEnPantalla() * (1 + GameConfig.CRECIMIENTO_MAX_PANTALLA));
+
+        return new GameLogic(
+                nuevaRonda,
+                this.puntuacion,
+                nuevaVel,
+                nuevaVel,
+                nuevosEnemigos,
+                nuevoMaxPantalla,
+                texEnemigos,
+                texFlecha,
+                texCargaFuego,
+                this.catalogoPotenciadores
+        );
     }
 
     public boolean puedeDisparar() {
@@ -160,7 +207,9 @@ public class GameLogic {
     public int getCantEnemigos() { return oleadaActual.getCantEnemigos(); }
     public int getMaxEnPantalla() { return oleadaActual.getMaxEnPantalla(); }
     public Shulker getJugador() { return jugador; }
-    public ArrayList<Enemigo> getEnemigos() { return oleadaActual.getEnemigosActivos(); }
-    public List<Proyectil> getBalas() { return balas; }
-    public List<Potenciador> getPotenciadores() { return potenciadores; }
+
+    // GM-5: uso de interfaz List - retorno de copias de las colecciones originales
+    public List<Enemigo> getEnemigos() { return oleadaActual.getEnemigosActivos(); }
+    public List<Proyectil> getBalas() { return new ArrayList<>(balas); }
+    public List<Potenciador> getPotenciadores() { return new ArrayList<>(potenciadores); }
 }

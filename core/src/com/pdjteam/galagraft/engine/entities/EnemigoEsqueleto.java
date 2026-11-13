@@ -1,15 +1,12 @@
 package com.pdjteam.galagraft.engine.entities;
 
-import java.util.List;
-
 import com.badlogic.gdx.graphics.Texture;
-
 import com.pdjteam.galagraft.config.GameConfig;
 
 public class EnemigoEsqueleto extends Enemigo {
 
-    public EnemigoEsqueleto(float x, float y, Texture texEsqueleto, Texture texFlecha, List<Proyectil> proyectiles) {
-        super(x, y, 120f, -15f, 2, GameConfig.INTERVALO_DISPARO_ESQUELETO, 100, texEsqueleto, texFlecha, proyectiles);
+	public EnemigoEsqueleto(float x, float y, Texture texEsqueleto, Texture texFlecha) {
+        super(x, y, 120f, -15f, 2, GameConfig.INTERVALO_DISPARO_ESQUELETO, 100, texEsqueleto, texFlecha);
     }
 
     @Override
