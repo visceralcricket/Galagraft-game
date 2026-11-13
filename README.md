@@ -57,7 +57,7 @@ gradlew.bat desktop:run
 + GM-6: Patrón Singleton implementado en el Shulker (jugador único).
 + GM-7: Patrón Strategy aplicado en los tipos de disparo (DisparoSimple, DisparoTriple).
 + GM-8: Patrón Template Method en la clase Enemigo para definir el ciclo de actualización base.
-- GM-9 [PENDIENTE]: Patrón Builder diseñado para ser utilizado en la instanciación de las rondas/oleadas de enemigos.
++ GM-9: Patrón Builder implementado para crear y gestionar las rondas/oleadas de enemigos.
 + GM-10: Uso extensivo de Github con ramas y múltiples commits.
 ```
 

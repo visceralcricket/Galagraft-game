@@ -77,6 +77,7 @@ public final class GameConfig {
 	public static final String SND_DISPARO = "shulker_sound.mp3";
 	public static final String SND_DISPARO_J = "disparoJ.mp3";
 	public static final String SND_MUSICA_JUEGO = "music.mp3";
+	public static final String SND_ENEMIGO_HERIDO = "sonido_enemigo_herido.mp3";
 	public static final String TEX_SHULKER = "shulker.png";
 	public static final String TEX_BALA = "bala.png";
 	public static final String TEX_FLECHA = "flecha_recortada.png";
