@@ -124,10 +124,6 @@ public class PantallaJuego implements Screen {
 			else gameMusic.play();
 		}
 
-		if(Gdx.input.isKeyJustPressed(Input.Keys.E)) {
-			logica.getJugador().activarPotenciador(new DisparoTriplePowerUpStrategy());
-		}
-
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		viewport.apply();
 		camera.update();
